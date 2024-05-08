@@ -250,7 +250,8 @@ void FilterFlowMeterNoise(void)
 
 // PIN INTERRUPT ISR
 // DETECTING FLOW SENSOR INPUT...
-static void CheckFlowMeterIsr(void)
+//static void CheckFlowMeterIsr(void)
+void CheckFlowMeterIsr(void)
 {
     U8 i;
 
@@ -271,7 +272,7 @@ static void CheckFlowMeterIsr(void)
 
 __interrupt static void r_intc11_interrupt(void)
 {
-    CheckFlowMeterIsr();
+   // CheckFlowMeterIsr();
 }
 
 

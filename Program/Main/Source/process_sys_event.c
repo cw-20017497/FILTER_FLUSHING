@@ -274,6 +274,7 @@ static void Evt_10ms_Handler( void )
 }
 
 
+extern void CheckFlowMeterIsr(void);
 static void Evt_100ms_Handler(void)
 {
     StartTimer( TIMER_ID_100MS, 100);
@@ -325,6 +326,9 @@ static void Evt_100ms_Handler(void)
     ControlMonitoring();
 
     UpdateSoundTimer();
+
+    // FLOW METER
+    CheckFlowMeterIsr();
 
     WifiControlProcess(WIFI_TIME_100MS);
 }

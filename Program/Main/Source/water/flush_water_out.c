@@ -56,8 +56,8 @@ static U32 GetFindOutTargetTime( WaterOutType_T mType);
 
 const static WaterOutTable_T FlushTableList[] = 
 {
-    { OUT_AMOUNT_FLUSH_FILTER,          AMOUNT_3000  },
-    //{ OUT_AMOUNT_FLUSH_HEATER,          AMOUNT_250   },
+    //{ OUT_AMOUNT_FLUSH_FILTER,          AMOUNT_3000  },
+    { OUT_AMOUNT_FLUSH_FILTER,          AMOUNT_TIME_2MIN  },
     { OUT_AMOUNT_FLUSH_HEATER,          AMOUNT_500   },
     { OUT_AMOUNT_FLUSH_COOLER,          AMOUNT_1000  },
     { OUT_AMOUNT_FLUSH_COOLER_DRAIN,    AMOUNT_5000 },
@@ -239,48 +239,7 @@ void TurnOnFlushOut(WaterOutType_T mType)
 
     FlushOut.Out          = TRUE;
 
-    if( FlushOut.SetupInit == FLUSH_STATUS_INIT )
-    {
-        // 필터 플러싱 + 온수 히터 채우기 + 냉수 탱크 채우기
-        FlushOut.TargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-        FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-        FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER );
-        FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER_DRAIN );
-
-        // 필터 플러싱 + 온수 히터 채우기 시간 계산
-        FlushOut.FilterTargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-        FlushOut.FilterTargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-
-        // 필터 플러싱 + 온수 히터 + 냉수 채우기 시간 계산
-        FlushOut.FlushColdTargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-        FlushOut.FlushColdTargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-        FlushOut.FlushColdTargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER );
-    }
-    else if( FlushOut.Status == FLUSH_STATUS_INIT )
-    {
-        // 필터 플러싱 + 온수 히터 채우기 + 냉수 탱크 채우기
-        FlushOut.TargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-        FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-        FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER );
-
-        // 필터 플러싱 + 온수 히터 채우기 시간 계산
-        FlushOut.FilterTargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-        FlushOut.FilterTargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-    }
-    else 
-    {
-        if( GetSystem() == SYSTEM_CHP )
-        {
-            FlushOut.TargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-            FlushOut.TargetAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER );
-
-            FlushOut.FilterTargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-        }
-        else
-        {
-            FlushOut.TargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_COOLER );
-        }
-    }
+    FlushOut.TargetAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
 }
 
 
@@ -310,38 +269,7 @@ static U8 IsChangedOutStatus(void)
 
 static void StartFlushOut(void)
 {
-    if( FlushOut.SetupInit == FLUSH_STATUS_DONE 
-            && FlushOut.Status == FLUSH_STATUS_DONE )
-    {
-        // POWER ON
-        if( GetSystem() == SYSTEM_CHP )
-        {
-            SetFlushOutMode( POWER_ON_CHP );
-        }
-        else
-        {
-            SetFlushOutMode( POWER_ON_CP );
-        }
-    }
-    else
-    {
-        // FLUSH SETUP or FILTER
-        if( GetSystem() == SYSTEM_CHP )
-        {
-            SetFlushOutMode( FLUSH_OUT_CHP );
-        }
-        else
-        {
-            SetFlushOutMode( FLUSH_OUT_CP );
-        }
-
-        // 필터 교체인 경우 wifi paring, 냉수 탱크 플러싱 삭제
-        if( FlushOut.SetupInit == FLUSH_STATUS_DONE )
-        {
-            ClearFlushOutMode( FLUSH_OUT_EXCEPT_SETUP_INIT );
-            SetFlushOutMode( FLUSH_OUT_COLD );
-        }
-    }
+    SetFlushOutMode( FLUSH_OUT_FILTER );
 }
 
 
@@ -373,10 +301,10 @@ static FlushOutEvent_T OutEventList[] =
 {
     { FLUSH_OUT_PARING_WIFI,    0U, DoParingWifi         },
     { FLUSH_OUT_FILTER,         0U, DoFilterFlushing_CHP },     // FILTER + HEATER ( HOT DRAIN )
-    { FLUSH_OUT_FILTER_CP,      0U, DoFilterFlushing_CP  },     // FILTER + HEATER ( ROOM OUT )
-    { FLUSH_OUT_HEATER,         0U, DoFillHotWater       },
-    { FLUSH_OUT_COLD,           0U, DoFillColdWater      },     // FILLING COLD
-    { FLUSH_OUT_FLUSH_COLD,     0U, DoFillColdFlushWater },     // FILLING COLD & FLUSH COLD
+    //{ FLUSH_OUT_FILTER_CP,      0U, DoFilterFlushing_CP  },     // FILTER + HEATER ( ROOM OUT )
+    //{ FLUSH_OUT_HEATER,         0U, DoFillHotWater       },
+    //{ FLUSH_OUT_COLD,           0U, DoFillColdWater      },     // FILLING COLD
+    //{ FLUSH_OUT_FLUSH_COLD,     0U, DoFillColdFlushWater },     // FILLING COLD & FLUSH COLD
     { FLUSH_OUT_CLOSE_VALVE,    0U, DoCloseValves        },
     { FLUSH_OUT_DONE,           0U, DoDone               }
 };
@@ -476,10 +404,10 @@ static U8 DoFilterFlushing_CHP(U8 *pStep)
     switch( *pStep )
     {
         case FLUSH_OPEN_VALVE:
-            // open valve... hot water drain 
-            OpenValve( VALVE_HOT_IN );
-            OpenValve( VALVE_HOT_DRAIN );
-            CloseValve( VALVE_HOT_OUT );
+            OpenValve( VALVE_FILTER_FEED );
+            CloseValve( VALVE_FILTER_FLUSHING );
+            OpenValve( VALVE_FILTER_OUT );
+            CloseValve( VALVE_FILTER_DRAIN );
 
             mu16Time = VALVE_DELAY_TIME;
             (*pStep)++;
@@ -494,71 +422,26 @@ static U8 DoFilterFlushing_CHP(U8 *pStep)
             }
             else
             {
-                FlushOut.FilterTimeOut  = MAX_FILTER_TIME_OUT;
-
                 RegisterFlowMeterId( FLOW_ID_WATER, UpdateFlushCurrentAmount );
-                StartCheckOutage( OUTAGE_FLUSHING_DELAY_TIME, OUTAGE_CHECK_TIME_FLUSHING, TYPE_HOT_WATER  );
 
-                FlowValveInit();
-
-                mu16Time = CHECK_HEATER_WATT_TIME;
                 (*pStep)++;
             }
             break;
 
-
         case FLUSH_FILLING:
-            if( FlushOut.FilterTimeOut != 0 )
+            if( FlushOut.TargetAmount <= FlushOut.CurrentAmount )
             {
-                FlushOut.FilterTimeOut--;
-            }
-
-            // 일정 유량이 흐르면, 히터 전력 및 필요 유량 계산
-            mAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_CHECK_HEATER );
-            if( FlushOut.CurrentAmount >= mAmount )
-            {
-                if( mu16Time != 0 )
-                {
-                    mu16Time--;
-                    SetHeaterOutput( 100 );
-                }
-                else
-                {
-                    SetHeaterOutput( 0 );
-                }
-
-                SetHotWaterInitFull( TRUE );
-            }
-            CheckHeaterWatt( GetHeaterOutput() );
-
-            // done filter flush and fill heater 
-            if( FlushOut.FilterTimeOut == 0 )
-            {
-                // 1. 최대 동작 시간 타임 아웃
-                FlushOut.CurrentAmount = GetFindOutTargetTime( OUT_AMOUNT_FLUSH_FILTER );
-                FlushOut.CurrentAmount += GetFindOutTargetTime( OUT_AMOUNT_FLUSH_HEATER );
-
-                SetHeaterOutput( 0 );
-                (*pStep)++;
-            }
-            else if( FlushOut.CurrentAmount >= FlushOut.FilterTargetAmount )
-            {
-                // 2. 2. 목표 유량 도달 
-                SetHeaterOutput( 0 );
                 (*pStep)++;
             }
 
+            return TRUE;
             break;
 
         case FLUSH_DONE:
-            SetHeaterOutput( 0 );
 
-            UpdateRegionTempIn();
-            StopCheckOutage();
+            SetHotWaterInitFull( TRUE );
+            SetFlushOutMode( FLUSH_OUT_CLOSE_VALVE );
 
-            ResetFilterUsage();     // 필터 사용 시간 초기화
-            FlowValveTarget( DEFAULT_FLOW_TARGET );
-            CloseValve( VALVE_HOT_IN );
             (*pStep) = 0;
             return TRUE;
             break;
@@ -1145,15 +1028,8 @@ static U8 DoCloseValves(U8 *pStep)
 
         case CLOSE_VALVE:
             // Close All Valvaes..
-            CloseValve( VALVE_HOT_IN );
-            OpenValve( VALVE_HOT_DRAIN );
-
-            OpenValve( VALVE_COLD_AIR );
-            CloseValve( VALVE_COLD_IN );
-
-            CloseValve( VALVE_COLD_FLUSH );   // for CP model...
-
-            CloseValve( VALVE_COLD_DRAIN );
+            CloseValve( VALVE_FILTER_FEED );
+            CloseValve( VALVE_FILTER_OUT );
 
             SetHeaterOutput( 0 );
             // Unreigster flow meter..

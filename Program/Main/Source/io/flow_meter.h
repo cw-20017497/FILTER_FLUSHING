@@ -36,6 +36,9 @@
 #define AMOUNT_30000  105000UL     // 30L, 30min
 #define AMOUNT_60000  210000UL     // 60L, 60min...@1LPM
 
+
+#define AMOUNT_TIME_2MIN     1200UL // 2min @100ms
+
 // Outage Status
 typedef enum
 {

@@ -4,18 +4,23 @@
 #include "prj_type.h"
 
 
-#define VALVE_NOS               0x0001
+#define VALVE_NOS               0x0001      // NOS
 #define VALVE_ROOM_OUT          0x0002
 #define VALVE_HOT_IN            0x0004
 #define VALVE_HOT_OUT           0x0008
-#define VALVE_HOT_DRAIN         0x0010
-#define VALVE_COLD_AIR          0x0020
+#define VALVE_HOT_DRAIN         0x0010      // NOS
+#define VALVE_COLD_AIR          0x0020      // NOS
 #define VALVE_COLD_OUT          0x0040
 #define VALVE_COLD_IN           0x0080
 #define VALVE_COLD_DRAIN        0x0100
 #define VALVE_COLD_FLUSH        0x0200
 #define VALVE_ICE_TRAY_IN       0x0400
 
+// FITLER REVERSING-FLUSING SYSTEM
+#define VALVE_FILTER_FEED       VALVE_HOT_IN
+#define VALVE_FILTER_FLUSHING   VALVE_COLD_FLUSH
+#define VALVE_FILTER_OUT        VALVE_HOT_OUT
+#define VALVE_FILTER_DRAIN      VALVE_HOT_DRAIN
 
 #define VALVE_ALL ( \
         VALVE_NOS \
