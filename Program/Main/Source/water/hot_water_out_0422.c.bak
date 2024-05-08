@@ -1,0 +1,1555 @@
+#include "hw.h"
+#include "hot_water_out.h"
+#include "hot_water.h"
+#include "valve.h"
+#include "user.h"
+#include "temp.h"
+#include "flow_meter.h"
+#include "flow_valve.h"
+#include "hot_water_heater.h"
+#include "hot_water_flow.h"
+#include "hot_water_temp_table.h"
+#include "heater_table.h"
+#include "water_out_common.h"
+#include "heater_out.h"
+#include "eol.h"
+#include "sound.h"
+#include "error.h"
+#include "util.h"
+#include "flow_valve.h"
+#include "hot_water.h"
+
+
+
+dbg_hot_t   dbg_hot;
+
+static void InitCupTemp(TEMP_T mTargetTemp);
+static void CalcCupTemp(void);
+
+
+// DELAY TIME OPEN VALVE INTERVAL 
+#define VALVE_DELAY_TIME  100  // 1sec @10ms
+
+// call interval @10ms
+
+HotOut_T   HotOut;
+CupTemp_T Cup;
+
+static void InitOutEventList(void);
+static void UpdateHotCurrentAmount(void);
+static void UpdateHotInitCurrentAmount(void);
+
+void InitHotOut(void)
+{
+    HotOut.Out      = FALSE;
+    HotOut.PrevOut  = FALSE;
+    HotOut.Type     = 0;
+
+    //HotOut.LPM  = MAX_HOT_OUT_LPM;      // 온수 추출 마지막 LPM
+    HotOut.LPM  = MAX_LPM;
+
+    HotOut.TargetAmount  = 0UL;
+    HotOut.CurrentAmount = 0UL;
+
+    HotOut.Mode = 0U;
+    HotOut.RegionTempIn = REGION_TEMP_MID;
+
+    HotOut.AverageOutTemp  = 0.0f;
+
+    // 초기화 추출량은 약 250CC
+    HotOut.InitTargetAmount     = GetFindOutTargetTime( OUT_AMOUNT_250 );
+    HotOut.InitCurrentAmount    = 0UL;
+    HotOut.InitCheckWattAmount  = 0UL;
+
+    HotOut.CoolingTime  = 0U;
+    HotOut.MaxTimeOut   = 0U;
+
+    FlowValveFullOpen();
+}
+
+void  GetHotOutData(HotOut_T *pData)
+{
+    MEMCPY((void __FAR *) pData, (const void __FAR *)&HotOut, sizeof( HotOut_T ));
+}
+
+TEMP_T  GetHotOutAverageOutTemp(void)
+{
+    return HotOut.AverageOutTemp;
+}
+
+TEMP_T GetHotOutPreheatTemp(void)
+{
+    return HotOut.TargetPreHeatTemp;
+}
+
+
+void UpdateRegionTempIn(void)
+{
+    TEMP_T tIn;
+
+
+    tIn = GetTemp( TEMP_ID_HOT_IN );
+    if( HotOut.RegionTempIn == REGION_TEMP_LOW )
+    {
+        if( tIn >= 25.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_HIGH;
+        }
+        else if( tIn >= 16.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_MID;
+        }
+    }
+    else if( HotOut.RegionTempIn == REGION_TEMP_MID )
+    {
+        if( tIn >= 25.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_HIGH;
+        }
+        else if( tIn <= 15.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_LOW;
+        }
+    }
+    else // if( HotOut.RegionTempIn == REGION_TEMP_HIGH )
+    {
+        if( tIn <= 24.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_MID;
+        }
+        else if( tIn <= 15.0f )
+        {
+            HotOut.RegionTempIn = REGION_TEMP_LOW;
+        }
+    }
+}
+
+
+// LPM
+F32 GetHotOutLPM(void)
+{
+    return HotOut.LPM;
+}
+
+void SetHotOutLPM(F32 mf32LPM)
+{
+    HotOut.LPM = mf32LPM;
+}
+
+void UpdateHotOutLPM(F32 mf32LPM)
+{
+    if( mf32LPM > MAX_LPM )
+    {
+        HotOut.LPM  = MAX_LPM;
+    }
+    else if( mf32LPM < MIN_LPM )
+    {
+        HotOut.LPM  = MIN_LPM;
+    }
+    else
+    {
+        HotOut.LPM  = mf32LPM;
+    }
+}
+
+
+// 100ms interval
+#define SUM_DELAY_TIME      10  // 100ms @10ms
+static void ResetAverageOutTemp(void)
+{
+    HotOut.SumCount         = 0;
+    HotOut.SumOutTemp       = 0.0f;
+    HotOut.SumDelayTime     = SUM_DELAY_TIME;
+}
+
+static void CalcAverageOutTemp(void)
+{
+    if( HotOut.SumDelayTime != 0 )
+    {
+        HotOut.SumDelayTime--;
+    }
+    else
+    {
+        HotOut.SumDelayTime = SUM_DELAY_TIME;
+
+        HotOut.SumCount++;
+        HotOut.SumOutTemp += GetTemp( TEMP_ID_HOT_OUT );
+        HotOut.AverageOutTemp   = HotOut.SumOutTemp / (TEMP_T)HotOut.SumCount;
+    }
+}
+
+
+// 상세 제어 모드 
+void SetHotOutMode( U16 mu16Mode )
+{
+    HotOut.Mode |= mu16Mode;
+}
+
+U16 GetHotOutMode(void )
+{
+    return HotOut.Mode;
+}
+
+void ClearHotOutMode( U16 mu16Mode )
+{
+    HotOut.Mode &= ~mu16Mode;
+}
+
+U8 IsSetHotOutMode(U16 mu8Mode )
+{
+    if( (HotOut.Mode & mu8Mode ) == mu8Mode )
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+void TurnOnHotOut(WaterOutType_T mType)
+{
+    U8 mu8Sel;
+    U8 mu8Class;
+
+
+    mu8Class = GetHeaterClass();
+    mu8Sel   = GetHotSelect();
+
+    HotOut.Out                  = TRUE;
+    HotOut.Type                 = mType;
+    HotOut.TargetAmount         = GetFindOutTargetTime( HotOut.Type );
+    HotOut.TargetOutTemp        = GetHotTargetOutTemp( mu8Sel, mu8Class, HotOut.RegionTempIn );
+    HotOut.TargetPreHeatTemp    = GetHotTargetPreHeatTemp( mu8Sel, mu8Class, HotOut.RegionTempIn );
+}
+
+
+U8 IsHotOut(void)
+{
+    return HotOut.Out;
+}
+
+
+void TurnOffHotOut(void)
+{
+    HotOut.Out = FALSE;
+}
+
+
+static U8 IsChangedOutStatus(void)
+{
+    if( HotOut.Out != HotOut.PrevOut )
+    {
+        HotOut.PrevOut = HotOut.Out;
+
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+
+// 온수 추출 시작
+static void StartHotOut(void)
+{
+    if( GetHotWaterInitFull() == FALSE )
+    {
+        SetHotOutMode( HOT_OUT_FIRST );
+    }
+    else 
+    {
+        SetHotOutMode( HOT_OUT_ALL );
+    }
+    ClearHotOutMode( HOT_OUT_RESET );
+
+    HotOut.CurrentAmount        = 0;
+    HotOut.InitCurrentAmount    = 0;
+}
+
+// 온수 추출 시작 (EOL 모드용)
+static void StartHotOutEol(void)
+{
+    SetHotOutMode( HOT_OUT_ALL_EOL );
+
+    HotOut.CurrentAmount        = 0;
+    HotOut.InitCurrentAmount    = 0;
+}
+
+static void StopHotOut(void)
+{
+    U8 mu8IsOut = FALSE;
+    U8 mu8IsPreHeat = FALSE;
+    U8 mu8IsInit = FALSE;
+
+
+    mu8IsOut     = IsSetHotOutMode( HOT_OUT_OUT );
+    mu8IsPreHeat = IsSetHotOutMode( HOT_OUT_PRE_HEATING );
+    mu8IsInit    = IsSetHotOutMode( HOT_OUT_INIT_DRAIN );
+    if ( mu8IsOut == TRUE 
+            || mu8IsPreHeat == TRUE
+            || mu8IsInit == TRUE)
+    {
+        ClearHotOutMode( HOT_OUT_CANCEL );
+        SetHotOutMode( HOT_OUT_DONE );
+    }
+}
+
+
+
+typedef U8 (*DoAction_T)(U8 *pStep);
+typedef struct _hot_out_event_
+{
+    U16 Mode;               // 출수 동작 상세 제어 모드
+    U8  Step;               // 이벤트 헨들러 스텝 변수
+    DoAction_T DoAction;    // 제어 모드에 대한 이벤트 핸들러
+} HotOutEvent_T;
+
+static U8 DoInitDrain(U8 *pStep);
+static U8 DoCooling(U8 *pStep);
+static U8 DoPreHeating(U8 *pStep);
+static U8 DoOut(U8 *pStep);
+static U8 DoOutEol(U8 *pStep);
+static U8 DoDone(U8 *pStep);
+static U8 DoReset(U8 *pStep);
+static HotOutEvent_T OutEventList[] = 
+{
+    // 전력 측정 빠짐..
+    { HOT_OUT_INIT_DRAIN,   0U, DoInitDrain     },
+    { HOT_OUT_COOLING,      0U, DoCooling       },
+    { HOT_OUT_PRE_HEATING,  0U, DoPreHeating    },
+    { HOT_OUT_OUT_EOL,      0U, DoOutEol        },
+    { HOT_OUT_OUT,          0U, DoOut           },
+    { HOT_OUT_DONE,         0U, DoDone          },
+    { HOT_OUT_RESET,        0U, DoReset         }
+};
+#define SZ_HOT_OUT_EVENT_LIST  (sizeof(OutEventList)/sizeof(HotOutEvent_T))
+
+static void InitOutEventList(void)
+{
+    U8 i;
+
+    for( i = 0; i < SZ_HOT_OUT_EVENT_LIST ; i++ )
+    {
+        OutEventList[i].Step = 0U;
+    }
+}
+
+static void Outflow(void)
+{
+    U8 i;
+    U8 mu8Ret = FALSE;
+    U8 mu8Step;
+    U16 mu16Mode;
+    HotOutEvent_T *pList = NULL;
+
+    for( i = 0; i < SZ_HOT_OUT_EVENT_LIST ; i++ )
+    {
+        pList = &OutEventList[ i ];
+
+        if( IsSetHotOutMode( pList->Mode ) == TRUE )
+        {
+            if( pList->DoAction != NULL )
+            {
+                mu8Ret = pList->DoAction( &pList->Step );
+                if( mu8Ret == TRUE )
+                {
+                    ClearHotOutMode( pList->Mode );
+                }
+                break;
+            }
+        }
+    }
+}
+
+/*
+ * *** 온수 히터 채우는 동작
+ * 
+ *  -. 탱크에 물이 없는 상태에서 히팅하는 경우 히터 소손 방지
+ *  -. 배수 밸브로 추출
+ *  -. 배수 유량은 MAX
+ *  -. 단수 발생시 동작 중지
+ *  -. 추출 종지 조건
+ *     > 최대 동작 시간 초과 ( 3분 )
+ */
+enum
+{
+    DRAIN_OPEN_OUT,
+    DRAIN_OPEN_IN,
+    DRAIN_DOING,
+    DRAIN_TURN_OFF_HEATER,
+    DRAIN_CLOSE_IN,
+    DRAIN_DONE,
+};
+
+#define MAX_TIME_OUT_INIT    18000U   // 3min( 3min*60sec*100(@10ms) = 180sec
+#define CHECK_HEATER_WATT_TIME   300U    // 3sec
+static U8 DoInitDrain(U8 *pStep)
+{
+    static U16 mu16Time = 0U; // @10ms
+
+    switch( *pStep )
+    {
+        case DRAIN_OPEN_OUT:
+            // 밸브 초기화 ( 드레인 OPEN, 유량 최대 OPEN )
+            OpenValve( VALVE_HOT_DRAIN );
+            CloseValve( VALVE_HOT_OUT );
+            FlowValveFullOpen();
+
+            // START CHECK OUTAGE
+            RegisterFlowMeterId( FLOW_ID_WATER, UpdateHotInitCurrentAmount );
+            StartCheckOutage( OUTAGE_DELAY_TIME, OUTAGE_CHECK_TIME_3SEC, TYPE_HOT_WATER );
+
+            // 히터 전력 검사 시점을 목표 배수량의 50% 지점으로 설정한다.
+            HotOut.InitCheckWattAmount  = HotOut.InitTargetAmount / 2UL;
+            HotOut.InitCurrentAmount    = 0UL;
+            HotOut.MaxTimeOut           = MAX_TIME_OUT_INIT;
+
+            mu16Time = VALVE_DELAY_TIME;  
+            (*pStep)++;
+            break;
+
+        case DRAIN_OPEN_IN:
+            // 대기 시간 후, 입수 밸브 OPEN
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                // OPEN IN VALVE
+                OpenValve( VALVE_HOT_IN );
+
+                mu16Time = CHECK_HEATER_WATT_TIME;
+                (*pStep)++;
+            }
+            break;
+
+        case DRAIN_DOING:
+
+            // 초기 배수 완료
+            if( HotOut.InitTargetAmount <= HotOut.InitCurrentAmount )
+            {
+                SetHotOutMode( HOT_OUT_DONE );
+                SetHotWaterInitFull( TRUE );
+
+                (*pStep)++;
+                break;
+            }
+            else
+            {
+                // 최대 동작 시간 초과
+                if( HotOut.MaxTimeOut != 0 )
+                {
+                    HotOut.MaxTimeOut--;
+                }
+                else
+                {
+                    (*pStep)++;
+                    break;
+                }
+            }
+
+            // CHECK HEATER WATT 
+            //  -. TURN ON FULL POWER HEATER
+            //  -. AND CHECK HEATER WATT
+            if( HotOut.InitCheckWattAmount <= HotOut.InitCurrentAmount )
+            {
+                if( mu16Time != 0 )
+                {
+                    mu16Time--;
+                    SetHeaterOutput( 100 );
+                }
+                else
+                {
+                    SetHeaterOutput( 0 );
+                }
+            }
+
+            CheckHeaterWatt( GetHeaterOutput() );
+            break;
+
+        case DRAIN_TURN_OFF_HEATER:
+            SetHeaterOutput( 0 );
+
+            mu16Time = VALVE_DELAY_TIME;  
+            (*pStep)++;
+            break;
+
+        case DRAIN_CLOSE_IN:
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                UpdateRegionTempIn();
+
+                CloseValve( VALVE_HOT_IN );
+                (*pStep)++;
+            }
+            break;
+
+        case DRAIN_DONE:
+            return TRUE;
+            break;
+
+        default:
+            (*pStep) = 0;
+
+            break;
+    }
+
+    return FALSE;
+}
+
+/*
+ * *** 온수 히터 과열식히는 동작 
+ * 
+ *  -. 배수 밸브로 추출
+ *  -. 배수 유량은 MAX
+ *  -. 단수 발생시 동작 중지
+ *  -. 추출 종지 조건
+ *     > 최대 동작 시간 초과 ( 10초 )
+ */
+enum
+{
+    COOLING_OPEN_DRAIN,
+    COOLING_OPEN_OUT,
+    COOLING_DOING,
+    COOLING_CLOSE_IN,
+    COOLING_DONE,
+};
+
+#define COOLING_TIME            1000 // 10sec @10ms
+static U8 DoCooling(U8 *pStep)
+{
+   static U16 mu16Time = 0U; // @10ms
+
+    switch( *pStep )
+    {
+        case COOLING_OPEN_DRAIN:
+            OpenValve( VALVE_HOT_IN );
+            OpenValve( VALVE_HOT_DRAIN );
+
+            SetHeaterOutput( 0 );
+            FlowValveFullOpen();
+
+            // START CHECK OUTAGE
+            RegisterFlowMeterId( FLOW_ID_WATER, UpdateHotInitCurrentAmount );
+            StartCheckOutage( OUTAGE_DELAY_TIME, OUTAGE_CHECK_TIME_3SEC, TYPE_HOT_WATER );
+
+            HotOut.CoolingTime = COOLING_TIME;
+            mu16Time = VALVE_DELAY_TIME;
+
+            (*pStep)++;
+            break;
+
+        case COOLING_OPEN_OUT:
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                CloseValve( VALVE_HOT_OUT );
+                (*pStep)++;
+            }
+            break;
+
+        case COOLING_DOING:
+            // 단수 상태면 종료
+            // COOLING 시간이 초과되면 종료
+            if( GetOutageStatus(TYPE_HOT_WATER) == FLOW_OUTAGE )
+            {
+                (*pStep)++;
+            }
+            else if( HotOut.CoolingTime != 0 )
+            {
+                HotOut.CoolingTime--;
+            }
+            else
+            {
+                (*pStep)++;
+            }
+
+            mu16Time = VALVE_DELAY_TIME;  
+            break;
+
+        case COOLING_CLOSE_IN:
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                CloseValve( VALVE_HOT_IN );
+                (*pStep)++;
+            }
+            break;
+
+        case COOLING_DONE:
+
+            return TRUE;
+            break;
+
+        default:
+            (*pStep) = 0;
+
+            break;
+    }
+
+    return FALSE;
+}
+
+
+
+/******************************************************************************
+ * PRE-HEAT
+ */
+PreHeat_T PreHeat;
+
+U8 GetHotOutPreheatLevel(void)
+{
+    return PreHeat.DispStep;
+}
+
+static U8 IsTimeOutPreHeating(void)
+{
+    if( PreHeat.HeatingTime < PreHeat.MaxTimeOut )
+    {
+        PreHeat.HeatingTime++;
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+#define MIN_PREHEAT_ON_TIME  300   // 3sec
+static U8 IsReachedTargetTemp(void)
+{
+    if( HotOut.TargetPreHeatTemp <= GetTemp( TEMP_ID_HEATER ) )
+    {
+        if( PreHeat.HeaterOnTime >= MIN_PREHEAT_ON_TIME )
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+enum
+{
+    PRE_HEAT_INIT,
+
+    PRE_HEAT_CHECK_OUTAGE,
+    PRE_HEAT_CALC,
+    PRE_HEAT_COOLING_HEATER,
+    PRE_HEAT_DOING,
+    PRE_HEAT_DOING_DONE,
+
+    PRE_HEAT_DONE
+};
+
+
+static U16 GetPreHeatPower(void)
+{
+#if 0
+    if( GetTemp( TEMP_ID_HEATER ) < 80.0f )
+    {
+        return 100;
+    }
+
+    // coffer, user
+    return 50;
+#endif
+    // 우유 선택시... 히터 반만 on
+    if( HotOut.TargetPreHeatTemp <= 45.0f )
+    {
+        // milk
+        return 50;
+    }
+
+    return 100;
+}
+
+
+#define HEATER_TEMP_NUM 3
+TEMP_T tHeaterTemp[ HEATER_TEMP_NUM ];
+U8 tHeaterCount = 0;
+
+static void InitHeaterTemp(void)
+{
+    tHeaterCount = HEATER_TEMP_NUM;
+
+    tHeaterTemp[ 0 ] = 0.0f;
+    tHeaterTemp[ 1 ] = 0.0f; 
+    tHeaterTemp[ 2 ] = 0.0f; 
+}
+
+static void SetHeaterTemp(TEMP_T mTemp)
+{
+    if( tHeaterTemp[2] != mTemp )
+    {
+        if( tHeaterCount != 0 )
+        {
+            tHeaterCount--;
+        }
+
+        tHeaterTemp[ 0 ] = tHeaterTemp[ 1 ];
+        tHeaterTemp[ 1 ] = tHeaterTemp[ 2 ];
+        tHeaterTemp[ 2 ] = mTemp;
+    }
+}
+
+#define TEMP_STATUS_NONE        0
+#define TEMP_STATUS_RISING      1
+#define TEMP_STATUS_FALLING     2
+static U8 GetStatusHeaterTemp(void)
+{
+    if( tHeaterCount != 0 )
+    {
+        return TEMP_STATUS_NONE;
+    }
+
+    if( tHeaterTemp[0] < tHeaterTemp[1] 
+            && tHeaterTemp[1] < tHeaterTemp[2] )
+    {
+        return TEMP_STATUS_RISING;
+    }
+
+    if( tHeaterTemp[0] > tHeaterTemp[1] 
+            && tHeaterTemp[1] > tHeaterTemp[2] )
+    {
+        return TEMP_STATUS_FALLING;
+    }
+
+    return TEMP_STATUS_NONE;
+}
+
+
+#define MAX_TIME_OUT_PREHEAT  900U     // 9sec @10ms
+U16 mu16PreheatOutput = 50;   // defualt 50%
+U16 dbg_the_heating_time = 0;
+U16 dbg_the_real_heating_time = 0;
+U8 dbg_the_flag = 0;
+
+U8 dbg_int_the_count = 0;
+U8 dbg_done_the_count = 0;
+U16 dbg_pre_heat_time[7];
+U8 dbg_up = 0;
+U8 dbg_down = 0;
+static U8 DoPreHeating(U8 *pStep)
+{
+   static U16 mu16Time = 0U; // @10ms
+   static U16 mu16DefaultOutput = 100;
+   static TEMP_T tHeater = 0.0f;
+   static U8 mu8Lower = FALSE;
+
+
+   dbg_pre_heat_time[ *pStep ]++;
+    switch( *pStep )
+    {
+        case PRE_HEAT_INIT:
+
+            dbg_int_the_count++;
+            mu8Lower = FALSE;
+            InitHeaterTemp();
+
+            // 배수 최대 동작 시간 계산
+            PreHeat.tHotIn      = GetTemp( TEMP_ID_HOT_IN );
+            PreHeat.MaxTimeOut  = MAX_TIME_OUT_PREHEAT;
+            PreHeat.HeatingTime = 0U;
+            PreHeat.HeaterOnTime = 0U;
+
+            // 목표 온도 설정
+            SetHeaterTempTargetOut( HotOut.TargetOutTemp );
+
+            // FLOW 센서 셋업
+            RegisterFlowMeterId( FLOW_ID_WATER, UpdateHotInitCurrentAmount );
+            StartCheckOutage( OUTAGE_HOT_OUT_DELAY_TIME, OUTAGE_CHECK_TIME_3SEC, TYPE_HOT_WATER );
+
+            // INIT VALVE
+            CloseValve( VALVE_HOT_OUT );
+            OpenValve( VALVE_HOT_DRAIN );
+            OpenValve( VALVE_HOT_IN );
+
+            InitCupTemp( HotOut.TargetOutTemp );
+
+            PreHeat.DispStep = PREHEAT_PROGRESS_LEVEL_1;
+
+            // dbg //
+            dbg_pre_heat_time[ 0 ] = 0;
+            dbg_pre_heat_time[ 1 ] = 0;
+            dbg_pre_heat_time[ 2 ] = 0;
+            dbg_pre_heat_time[ 3 ] = 0;
+            dbg_pre_heat_time[ 4 ] = 0;
+            dbg_pre_heat_time[ 5 ] = 0;
+            dbg_pre_heat_time[ 6 ] = 0;
+            // dbg //
+
+            mu16Time =0;
+            (*pStep)++;
+            break;
+
+        case PRE_HEAT_CHECK_OUTAGE:
+            // 현재 온도가 목표 보다 낮으면 히터를 ON 하고 시작
+            if( HotOut.TargetPreHeatTemp >= GetTemp( TEMP_ID_HEATER ) )
+            {
+                mu8Lower = TRUE;
+                mu16DefaultOutput = GetPreHeatPower();
+                SetHeaterOutput( mu16DefaultOutput );   // 히터 출력 ON
+            }
+            //CheckHeaterWatt( GetHeaterOutput() );   // 히터 전력 측정
+
+
+            // 단수 검사
+            if( GetFlowMeterLPM() >= 0.1f )
+            {
+                if( ++mu16Time > 5 /* 50ms */ )     // Wait stable time... 
+                {
+                    (*pStep)++;
+                }
+            }
+            else
+            {
+                mu16Time = 0;
+            }
+            break;
+            
+        case PRE_HEAT_CALC:
+            // 유량 조절 밸브 셋팅
+            // 물을 흘린 후, 온수 입수 센서 값이 제대로 읽혀짐
+            {
+                F32 mLPM;
+                I16 mStep;
+
+                // 1. 목표 LPM 계산
+                CalcHeaterTargetLPM();                          
+                mLPM = GetHotWaterTargetLPM();
+
+                // 2. 목표 유량 조절( 상대 위치 추정 )
+                mLPM = SetMinMaxF32( mLPM, 0.3f, 1.0f );
+                mStep = GetFlowValveStep( mLPM );
+                if( IsCalSampleLPM() == TRUE )
+                {
+                    // 2-1.  상대 위치 추정 
+                    FlowValveOffset( mStep ); 
+
+                    // sync...
+                    SetFlowValveSampleLPM( mLPM, GetFlowValveTarget() );
+                }
+                else
+                {
+                    // 2-2.  절대 위치 추정
+                    FlowValveTarget( mStep ); 
+                }
+
+                // 3. 목표 WATT 설정
+                CalcHeaterTargetWatt( mLPM );                   
+                mu16PreheatOutput = CalcHeaterOutput();
+            }
+
+            (*pStep)++;
+            break;
+
+
+        case PRE_HEAT_COOLING_HEATER:
+            if( mu8Lower == TRUE )
+            {
+                (*pStep)++;
+                break;
+            }
+            else
+            {
+                if( GetStatusHeaterTemp() == TEMP_STATUS_FALLING )
+                {
+                    if( HotOut.TargetPreHeatTemp + 3.0f >= GetTemp(TEMP_ID_HEATER ) )
+                    {
+                        mu16DefaultOutput = GetPreHeatPower();
+                        SetHeaterOutput( mu16DefaultOutput );   // 히터 출력 ON
+
+                        dbg_down++;
+                        (*pStep)++;
+                        break;
+                    }
+                }
+                else 
+                {
+                    if( HotOut.TargetPreHeatTemp >= GetTemp(TEMP_ID_HEATER ) + 1.0f )
+                    {
+                        mu16DefaultOutput = GetPreHeatPower();
+                        SetHeaterOutput( mu16DefaultOutput );   // 히터 출력 ON
+
+                        dbg_up++;
+                        (*pStep)++;
+                        break;
+                    }
+                }
+            }
+
+            break;
+
+        case PRE_HEAT_DOING:
+
+            // 예열 온도가 목표 온도 대비 50% 도달시...
+            if( ( ((HotOut.TargetPreHeatTemp - tHeater ) * 0.7f ) + tHeater  )
+                    <= GetTemp( TEMP_ID_HEATER ) )
+            {
+                PreHeat.DispStep = PREHEAT_PROGRESS_LEVEL_3;
+            }
+            else if( ( ((HotOut.TargetPreHeatTemp - tHeater ) * 0.3f ) + tHeater  )
+                    <= GetTemp( TEMP_ID_HEATER ) 
+                    && PreHeat.DispStep == PREHEAT_PROGRESS_LEVEL_1)
+            {
+                PreHeat.DispStep = PREHEAT_PROGRESS_LEVEL_2;
+            }
+
+            // 히터 출력 반환
+            mu16DefaultOutput = GetPreHeatPower();
+            SetHeaterOutput( mu16DefaultOutput );   // 히터 출력 ON
+            CheckHeaterWatt( GetHeaterOutput() );   // 히터 전력 측정
+
+            dbg_the_real_heating_time++;
+
+            SetHeaterTemp( GetTemp( TEMP_ID_HEATER ));
+            if( IsReachedTargetTemp() == TRUE 
+                    && GetStatusHeaterTemp() == TEMP_STATUS_RISING )
+            {
+                // 목표 온도 도달
+                mu16Time = 100; // 1sec @10ms
+                (*pStep)++;
+            }
+            else
+            {
+                // 온도가 낮으면 배수 밸브를 CLOSE
+                RegisterFlowMeterId( FLOW_ID_WATER, NULL );
+                StopCheckOutage();
+
+                CloseValve( VALVE_HOT_IN );
+            }
+
+            break;
+
+        case PRE_HEAT_DOING_DONE:
+            PreHeat.DispStep = PREHEAT_PROGRESS_LEVEL_3;
+
+            // 히팅 종료 시점 온도 측정( for recoding(debug) )
+            PreHeat.tPreheatOut     = GetTemp( TEMP_ID_HOT_OUT );
+            PreHeat.tPreheatHeater  = GetTemp( TEMP_ID_HEATER );
+
+            (*pStep)++;
+
+            break;
+
+        case PRE_HEAT_DONE:
+            // 최초 계산했던 목표 출력을 적용함...
+            if( dbg_the_flag )
+            {
+                SetHeaterOutput( 0 );
+                break;
+            }
+            SetHeaterOutput( mu16PreheatOutput );
+
+            HotOut.CurrentAmount = 0;
+            (*pStep) = 0;
+            return TRUE;
+
+            break;
+
+        default:
+            (*pStep) = 0;
+            break;
+    }
+
+    if( GetHeaterOutput() > 0 )
+    {
+        PreHeat.HeaterOnTime++;
+    }
+
+    // 프리히팅 최대 동작 시간
+    if( (*pStep) > PRE_HEAT_INIT  && (*pStep) < PRE_HEAT_DOING_DONE )
+    {
+        if( IsTimeOutPreHeating() == TRUE )
+        {
+            PreHeat.DispStep = PREHEAT_PROGRESS_LEVEL_3;
+            (*pStep) = PRE_HEAT_DOING_DONE;
+        }
+    }
+
+
+    return FALSE;
+}
+
+
+/*
+ * *** 온수 추출 
+ * 
+ *  -. 배수 밸브로 추출
+ *  -. 배수 유량은 MAX
+ *  -. 단수 발생시 동작 중지
+ *  -. 추출 종지 조건
+ */
+enum
+{
+    OUT_INIT,
+    OUT_DOING,
+    OUT_DONE,
+};
+
+/* 추출 중 */
+#define UNSTABLE_AMOUNT   AMOUNT_20
+F32 dbg_the_offset = 0.15f;
+F32 dbg_the_offset_95 = 0.20f;
+F32 dbg_the_offset_99 = 0.30f;
+static void Outing(void)
+{
+    U16 mu16Output;
+
+
+    CalcAverageOutTemp();   // IOT, 평균 온수 추출 온도 계산
+
+    // 초기 unstable 상태이므로 대기...
+    if( HotOut.CurrentAmount < UNSTABLE_AMOUNT )
+    {
+        // 목표 WATT 계산
+        CalcHeaterTargetWatt( GetHotWaterTargetLPM() );
+        mu16Output =  CalcHeaterOutput();
+
+        SetHeaterOutput( mu16Output );
+    }
+    else
+    {
+        // 목표 WATT 계산
+        //SetHeaterTempTargetOut( HotOut.TargetOutTemp );
+        CalcHeaterTargetWatt( GetFlowMeterLPM() );
+        mu16Output =  CalcHeaterOutput();
+
+        // 히터 출력 제어
+        mu16Output = AdjustHeaterOutput( mu16Output, GetFlowMeterLPM(), HotOut.TargetOutTemp, GetTemp(TEMP_ID_HOT_OUT) );
+        SetHeaterOutput( mu16Output );
+
+        // 유량 제어
+        //AdjustFlowValve( mu16Output );
+        //AdjustFlowValveHotOut( HotOut.TargetOutTemp, GetTemp( TEMP_ID_HOT_OUT ));
+    }
+
+    if( HotOut.CurrentAmount >= AMOUNT_10 )
+    {
+
+        // 85도 출수시...
+        if( HotOut.TargetOutTemp >= 90 &&  GetTemp( TEMP_ID_HOT_OUT ) >= 98.0f )
+        {
+            AdjustFlowValveHotOut( GetHotWaterTargetLPM() + dbg_the_offset_99 , GetFlowMeterLPM() );
+        }
+        else if( HotOut.TargetOutTemp >= 90 &&  GetTemp( TEMP_ID_HOT_OUT ) >= 95.0f )
+        {
+            AdjustFlowValveHotOut( GetHotWaterTargetLPM() + dbg_the_offset_95 , GetFlowMeterLPM() );
+        }
+        else if( HotOut.TargetOutTemp < 90 &&  GetTemp( TEMP_ID_HOT_OUT ) >= 90.0f )
+        {
+            AdjustFlowValveHotOut( GetHotWaterTargetLPM() + dbg_the_offset , GetFlowMeterLPM() );
+        }
+        else
+        {
+            AdjustFlowValveHotOut( GetHotWaterTargetLPM(), GetFlowMeterLPM() );
+        }
+    }
+
+    // Re-Check heater watt
+    CheckHeaterWatt( GetHeaterOutput() );
+}
+
+static void StopOut(void)
+{
+    if( Cup.SumCount < CUP_HALF_NUM )
+    {
+        // 유량 조절 밸브 초기화
+        InitFlowValveSampleLPM();
+    }
+    else
+    {
+        // 유량 대비 모터 위치 값 2차 측정
+        SetFlowValveSampleLPM( GetFlowMeterLPM(), GetFlowValveTarget() );
+    }
+
+    // TURN OFF HEATER
+    SetHeaterOutput( 0 );
+
+    // CLOSE VALVES..
+    CloseValve( VALVE_HOT_OUT );
+    OpenValve( VALVE_HOT_DRAIN );
+    RegisterFlowMeterId( FLOW_ID_WATER, NULL );
+
+}
+
+
+static U8 DoOut(U8 *pStep)
+{
+    static U16 mu16Time = 0U; // @10ms
+
+
+    switch( *pStep )
+    {
+        case OUT_INIT:
+            // VALVE CONTROL
+            OpenValve( VALVE_HOT_OUT );
+            OpenValve( VALVE_HOT_IN );
+            CloseValve( VALVE_HOT_DRAIN );
+
+            // SET TARGET TEMPERTURE
+            SetHeaterTempTargetOut( HotOut.TargetOutTemp );
+            ResetAverageOutTemp();
+
+            // CLEAR CURRENT AMOUNT
+            HotOut.CurrentAmount    = 0U;
+            RegisterFlowMeterId( FLOW_ID_WATER, UpdateHotCurrentAmount );
+            StartCheckOutage( OUTAGE_HOT_OUT_DELAY_TIME, OUTAGE_CHECK_TIME_3SEC, TYPE_HOT_WATER );
+
+            InitAdjustFlowValve();
+            ResetHeaterOffset();
+
+            dbg_hot.adjust_up   = 0;
+            dbg_hot.adjust_down = 0;
+
+            (*pStep)++;
+            break;
+
+        case OUT_DOING:
+            if( HotOut.TargetAmount > HotOut.CurrentAmount )
+            {
+                /* 추출 중 */
+                Outing();
+            }
+            else
+            {
+                /* 추출 종료 */
+                StopOut();
+
+                // SET CLOSER IN VALVE DELAY TIME...
+                mu16Time = VALVE_DELAY_TIME;
+                (*pStep)++;
+            }
+            break;
+
+        case OUT_DONE:
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                CloseValve( VALVE_HOT_IN );
+
+                SetHotOutMode( HOT_OUT_DONE );
+                (*pStep) = 0;
+                return TRUE;
+            }
+
+            break;
+
+
+        default:
+            (*pStep) = 0;
+            break;
+    }
+
+    return FALSE;
+}
+
+
+// DO OUT - EOL MODE
+// 테스트 모드 추출 동작이므로.. 진공 질소임.
+// 히터 제어 없음
+enum
+{
+    EOL_OUT_OPEN_OUT,
+    EOL_OUT_DOING,
+    EOL_OUT_DONE,
+};
+static U8 DoOutEol(U8 *pStep)
+{
+    static U16 mu16Time = 0U; // @10ms
+
+
+    switch( *pStep )
+    {
+        case EOL_OUT_OPEN_OUT:
+            OpenValve( VALVE_HOT_OUT );
+            OpenValve( VALVE_HOT_IN );
+            CloseValve( VALVE_HOT_DRAIN );
+            FlowValveFullOpen();
+
+            mu16Time = VALVE_DELAY_TIME;
+
+            HotOut.CurrentAmount = 0U;
+
+            RegisterFlowMeterId( FLOW_ID_WATER, UpdateHotCurrentAmount );
+            StartCheckOutage( OUTAGE_DELAY_TIME, OUTAGE_CHECK_TIME_3SEC, TYPE_HOT_WATER );
+
+            (*pStep)++;
+            break;
+
+        case EOL_OUT_DOING:
+            SetHeaterOutput( 0 );
+
+            if( HotOut.TargetAmount > HotOut.CurrentAmount )
+            {
+                // doing...
+                OpenValve( VALVE_HOT_IN );
+            }
+            else
+            {
+                RegisterFlowMeterId( FLOW_ID_WATER, NULL );
+                StopCheckOutage();
+                CloseValve( VALVE_HOT_OUT );
+                OpenValve( VALVE_HOT_DRAIN );
+
+                mu16Time = VALVE_DELAY_TIME;
+                (*pStep)++;
+            }
+            break;
+
+        case EOL_OUT_DONE:
+            if( mu16Time != 0 )
+            {
+                mu16Time--;
+            }
+            else
+            {
+                CloseValve( VALVE_HOT_IN );
+
+                SetHotOutMode( HOT_OUT_DONE );
+                (*pStep) = 0;
+            }
+            break;
+
+        default:
+            (*pStep) = 0;
+            break;
+    }
+
+    return FALSE;
+}
+
+// 밸브 초기화
+// 히터 OFF
+// 유량 센서 OFF
+U8 dbg_do_done = 0;
+static U8 DoDone(U8 *pStep)
+{
+    dbg_done_the_count++;
+    // 온수 단수 에러 발생된 경우, 밸브 위치 초기화
+    if( IsErrorType( ERR_TYPE_HOT_WATER_OUT ) == TRUE 
+            || IsError( ERR_OUTAGE_HOT_WATER ) == TRUE 
+            || IsError( ERR_HEATER_OVERHEAT ) == TRUE )
+    {
+        InitFlowValveSampleLPM();
+    }
+    else
+    {
+        // 추출 전에 취소한 경우
+        if( Cup.SumCount < CUP_HALF_NUM )
+        {
+            //InitFlowValveSampleLPM();
+        }
+        else if( IsOpenValve( VALVE_HOT_OUT ) == TRUE )
+        {
+            // DEFAULT SETTING VALVES...
+            SetFlowValveSampleLPM( GetFlowMeterLPM(), GetFlowValveTarget() );
+        }
+    }
+
+#if CONFIG_TEST_HOT_DRAIN
+    CloseValve( VALVE_HOT_DRAIN );
+#else
+    OpenValve( VALVE_HOT_DRAIN );
+#endif
+    OpenValve( VALVE_HOT_IN );
+    CloseValve( VALVE_HOT_OUT );
+
+    UpdateRegionTempIn();
+
+    // TURN OFF HEATER...
+    SetHeaterOutput( 0 );
+    SetHotWaterHeaterOffsetWatt(0);
+    TURN_OFF_HEATER_TRIAC();
+    TURN_OFF_HEATER_RELAY();
+
+    // DEFAULT CURRENT AMOUNT & CHECK OUTAGE 
+    //RegisterFlowMeterId( FLOW_ID_WATER, NULL );
+    //StopCheckOutage();
+
+    SetHotOutMode( HOT_OUT_RESET );
+    dbg_do_done++;
+
+    return TRUE;
+}
+
+enum
+{
+    RESET_INIT,
+    RESET_DOING
+};
+
+U8 dbg_do_rest = 0;
+#define RESET_TIME  1000     // 10sec @ 10ms
+static U8 DoReset(U8 *pStep)
+{
+#if 1
+    static U16 mu16Time = 0U; // @10ms
+
+
+    switch( *pStep )
+    {
+        case RESET_INIT:
+            OpenValve( VALVE_HOT_DRAIN );
+            OpenValve( VALVE_HOT_IN );
+
+            mu16Time = RESET_TIME;
+
+            (*pStep)++;
+            break;
+
+        case RESET_DOING:
+            if( --mu16Time == 0 
+                    || GetTemp( TEMP_ID_HEATER ) < 40.0f 
+                    || GetWaterOut() == TRUE )
+            {
+                OpenValve( VALVE_HOT_DRAIN );
+                CloseValve( VALVE_HOT_IN );
+
+                StopCheckOutage();
+
+                (*pStep) = 0;
+                dbg_do_rest++;
+                return TRUE;
+            }
+            break;
+
+        default:
+            (*pStep) = 0;
+            break;
+    }
+
+    return FALSE;
+#else
+    OpenValve( VALVE_HOT_DRAIN );
+    CloseValve( VALVE_HOT_IN );
+    StopCheckOutage();
+
+    return TRUE;
+#endif
+}
+
+
+
+U8 GetHotOutPercent(void)
+{
+    return CalcPercent( HotOut.TargetAmount, HotOut.CurrentAmount );
+}
+
+// 추출 진행량( 0~ 999 mL )
+U16 GetHotOutAmount(void)
+{
+    return CalcLiter( HotOut.CurrentAmount );
+}
+
+static void UpdateUserUsage(U32 mu32Amount)
+{
+    U32 mu32TargetAmount;
+
+    mu32TargetAmount = GetFindOutTargetTime(  OUT_AMOUNT_10 );
+    if( mu32TargetAmount != 0 )
+    {
+        mu32Amount = mu32Amount / mu32TargetAmount;
+        mu32Amount *= 10;
+    }
+    else
+    {
+        mu32Amount = 0;
+    }
+
+    AddUserUsageWater( mu32Amount );
+}
+
+
+static void InitCupTemp(TEMP_T mTargetTemp)
+{
+    U8 i;
+
+    Cup.tSum             = 0.0f;
+    Cup.tAverage         = 0.0f;
+    Cup.SumCount         = 0;
+    Cup.AmountHz         = AMOUNT_10;
+    Cup.FirstTargetTemp  = mTargetTemp;
+    Cup.SecondTargetTemp = 0.0f;
+
+    for( i = 0; i < CUP_LIST_NUM ; i++ )
+    {
+        Cup.tSumList[ i ] = 0.0f;
+        Cup.lpmSumList[ i ] = 0.0f;
+    }
+}
+
+static void CalcCupTemp(void)
+{
+    TEMP_T tOut = 0.0f;
+    TEMP_T tTemp;
+
+    if( --Cup.AmountHz == 0 )
+    {
+        Cup.AmountHz = AMOUNT_10;
+
+        if( Cup.SumCount < CUP_LIST_NUM )
+        {
+            tOut = GetTemp( TEMP_ID_HOT_OUT );
+            Cup.lpmSumList[ Cup.SumCount ]  = GetFlowMeterLPM();
+            Cup.tSumList[ Cup.SumCount ]    = tOut;
+            Cup.tSum += tOut;
+
+            Cup.SumCount++;
+            Cup.tAverage = Cup.tSum / Cup.SumCount;
+
+            if( Cup.SumCount == CUP_HALF_NUM )
+            {
+                Cup.SecondTargetTemp = (Cup.FirstTargetTemp * 2) - Cup.tAverage;
+                // 앞 부분이 낮으면 +좀 해주고...
+                if( Cup.FirstTargetTemp > Cup.tAverage )
+                {
+                    Cup.SecondTargetTemp += 1.0f;
+                }
+                // 앞 부분이 높으면 -좀 해주고
+                else if( Cup.FirstTargetTemp < Cup.tAverage )
+                {
+                    Cup.SecondTargetTemp -= 1.0f;
+                }
+
+                // cut off max
+                if( Cup.SecondTargetTemp > 98.0f )
+                {
+                    Cup.SecondTargetTemp = 98.0f;
+                }
+
+                SetHeaterTempTargetOut( Cup.SecondTargetTemp );
+
+            }
+            else if( Cup.SumCount == CUP_ONE_NUM )
+            {
+                SetHeaterTempTargetOut( Cup.FirstTargetTemp );
+            }
+        }
+    }
+}
+
+// 추출량 카운트
+static void UpdateHotCurrentAmount(void)
+{
+    CalcCupTemp();
+    HotOut.CurrentAmount++;     
+}
+
+// 초기 배수 및 사용자 추출량
+static void UpdateHotInitCurrentAmount(void)
+{
+    HotOut.InitCurrentAmount++; 
+}
+
+static U8 IsDoneHotOut(void)
+{
+    // 단수 조건이면 종료한다.
+    if( IsErrorType( ERR_TYPE_HOT_WATER_OUT ) == TRUE )
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+#define HOT_OUT_ALARAM_TIME         800U
+U16 gu16SoundAlaram = HOT_OUT_ALARAM_TIME;  // 3sec @10ms..
+static void InitHotOutSound(void)
+{
+    gu16SoundAlaram = HOT_OUT_ALARAM_TIME;  // 3sec @10ms..
+}
+
+static void HotOutSound(void)
+{
+    if( GetHotSelect() == SEL_HOT_USER )
+    {
+        if( gu16SoundAlaram != 0 )
+        {
+            gu16SoundAlaram--;
+            if( gu16SoundAlaram == 1 )
+            {
+                Sound( SOUND_HOT_OUT );
+            }
+        }
+    }
+}
+
+// 추출 제어
+U8 ControlWaterHotOut(void)
+{
+    // 추출 상태 변경
+    if( IsChangedOutStatus() == TRUE )
+    {
+        // 정지 상태이면, 추출 시작
+        if( HotOut.Out == TRUE )
+        {
+            // 추출 시작
+            if( GetEolStatus() == TRUE )
+            {
+                StartHotOutEol();
+            }
+            else
+            {
+                StartHotOut();
+            }
+            InitOutEventList();
+
+        }
+        else
+        {
+            // 추출 중이였으면, 추출 중지
+            // Update User Usage
+            UpdateUserUsage( HotOut.CurrentAmount );
+
+            StopHotOut();
+            InitHotOutSound();
+        }
+    }
+
+
+    // 목표 추출량 만큼만 추출하고 종료한다.
+    if( HotOut.Out == TRUE )
+    {
+        if( IsDoneHotOut() == TRUE )
+        {
+            TurnOffHotOut();
+            Sound(SOUND_EFFLUENT_END);
+            return WATER_OUT_DONE;
+        }
+        else if( IsSetHotOutMode( HOT_OUT_DONE ) == TRUE )
+        {
+            TurnOffHotOut();
+            Sound(SOUND_EFFLUENT_END);
+            return WATER_OUT_DONE;
+        }
+        else if( IsError( ERR_HEATER_OVERHEAT ) == TRUE 
+                && IsSetHotOutMode( HOT_OUT_COOLING ) == FALSE )
+        {
+            TurnOffHotOut();
+            Sound(SOUND_EFFLUENT_END);
+            return WATER_OUT_DONE;
+        }
+        else if( IsSetHotOutMode( HOT_OUT_RESET ) == TRUE )
+        {
+            return WATER_OUT_DONE;
+        }
+
+        HotOutSound();
+    }
+
+
+    Outflow();
+    return WATER_OUT_GOING;
+}
