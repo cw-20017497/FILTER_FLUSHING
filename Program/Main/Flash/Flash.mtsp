@@ -16,30 +16,6 @@
       <ParentItem>02af7c10-acd2-45b8-8512-18ba70d39118</ParentItem>
       <Property>3f2623aa-56d5-42b9-be85-f81bbb3070a8</Property>
     </Instance>
-    <Instance Guid="4c549db0-b49c-412f-a89c-0630e6e78499">
-      <Name>Configsys</Name>
-      <Type>Category</Type>
-      <ParentItem>02af7c10-acd2-45b8-8512-18ba70d39118</ParentItem>
-      <Property>1b976225-10a5-4e36-b002-7c79f7f5ba21</Property>
-    </Instance>
-    <Instance Guid="7517aa13-9a99-41ea-9537-3213bf62d840">
-      <Name>driver</Name>
-      <Type>Category</Type>
-      <ParentItem>02af7c10-acd2-45b8-8512-18ba70d39118</ParentItem>
-      <Property>bbf4558b-6dd1-4e58-b6f0-6d69c7df04b7</Property>
-    </Instance>
-    <Instance Guid="1b0eaa0e-8f1e-4422-a9ea-fd3524d23447">
-      <Name>User</Name>
-      <Type>Category</Type>
-      <ParentItem>02af7c10-acd2-45b8-8512-18ba70d39118</ParentItem>
-      <Property>a5f73204-e5cb-4d88-af84-fc05ab419c3c</Property>
-    </Instance>
-    <Instance Guid="917ccf3d-c506-4136-a486-c4c423c5fee1">
-      <Name>Lib</Name>
-      <Type>Category</Type>
-      <ParentItem>02af7c10-acd2-45b8-8512-18ba70d39118</ParentItem>
-      <Property>babf7847-8008-4233-9829-26bdab68a2be</Property>
-    </Instance>
     <Instance Guid="52aa2c7c-7781-4606-b37c-4e6afa3756af">
       <Name>Flash.dr</Name>
       <Type>File</Type>
@@ -3658,18 +3634,6 @@
     <Instance Guid="3f2623aa-56d5-42b9-be85-f81bbb3070a8">
       <MemoCount>0</MemoCount>
     </Instance>
-    <Instance Guid="1b976225-10a5-4e36-b002-7c79f7f5ba21">
-      <MemoCount>0</MemoCount>
-    </Instance>
-    <Instance Guid="bbf4558b-6dd1-4e58-b6f0-6d69c7df04b7">
-      <MemoCount>0</MemoCount>
-    </Instance>
-    <Instance Guid="a5f73204-e5cb-4d88-af84-fc05ab419c3c">
-      <MemoCount>0</MemoCount>
-    </Instance>
-    <Instance Guid="babf7847-8008-4233-9829-26bdab68a2be">
-      <MemoCount>0</MemoCount>
-    </Instance>
     <Instance Guid="7b001f11-42ea-4585-a84b-21071d8f370d">
       <MemoCount>0</MemoCount>
     </Instance>
@@ -3758,6 +3722,9 @@
       <MemoCount>0</MemoCount>
     </Instance>
     <Instance Guid="5ead9729-56e2-4e4f-88b1-71f25e1a65e6">
+      <MemoCount>0</MemoCount>
+    </Instance>
+    <Instance Guid="7204e9ed-4dd4-4231-afd2-a9fa77e0a630">
       <MemoCount>0</MemoCount>
     </Instance>
   </Class>
@@ -4266,7 +4233,7 @@ cl0rle.lib
       <NumberOfLinesPerPage-DefaultValue>0</NumberOfLinesPerPage-DefaultValue>
       <TabWidth-DefaultValue>8</TabWidth-DefaultValue>
       <IsLockedByUser>False</IsLockedByUser>
-      <TimeTagModified--0>-8585541000645253529</TimeTagModified--0>
+      <TimeTagModified--0>-8584864559266288747</TimeTagModified--0>
       <AdditionalIncludePaths-0>..\Source\diagnosis
 ..\Source\Wifi\WifiUser\AIS4.0
 ..\Source\Wifi\WifiUser
@@ -4299,10 +4266,6 @@ cl0rle.lib
 ..\Source\display
 ..\Source\comm
 ..\Source
-Configsys
-Driver
-User
-Lib
 .
 </AdditionalIncludePaths-0>
       <AssemblyFile-0>NotOutput</AssemblyFile-0>
@@ -7356,7 +7319,7 @@ Lib
     &lt;PIOR4Value Name="PIOR4Value" Text="0" /&gt;
     &lt;PIOR5Value Name="PIOR5Value" Text="0" /&gt;
     &lt;ProjectName Name="PrjName" Text="Flash" /&gt;
-    &lt;ProjectPath Name="PrjPath" Text="D:\Work\project_svn\2021\ICON_AIS\Branch\MAIN_V9\Flash" /&gt;
+    &lt;ProjectPath Name="PrjPath" Text="D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\Program\Main\Flash" /&gt;
     &lt;ProjectKind Name="PrjKind" Text="Project78K0R" /&gt;
     &lt;DeviceName Name="DeviceName" Fixed="" Text="RL78G13" /&gt;
     &lt;MCUName Name="MCUName" Text="RL78G13_100pin" /&gt;
