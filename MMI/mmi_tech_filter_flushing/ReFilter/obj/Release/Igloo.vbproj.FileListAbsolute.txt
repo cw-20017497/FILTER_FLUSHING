@@ -1,0 +1,180 @@
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.pdb
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.exe.config
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.exe
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.xml
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.pdb
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.exe
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.pdb
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\bin\Release\Igloo.xml
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.Form.resources
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.Resources.resources
+D:\c-\Visual Studio 2015\Projects\Igloo\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v2\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v3\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v5\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v6\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v7\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v8\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\bin\Release\Igloo.exe.config
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\bin\Release\Igloo.exe
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\bin\Release\Igloo.pdb
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\bin\Release\Igloo.xml
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.Form.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.FormControl.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.FormDetail.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.FormHealth.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.FormOverride.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.Resources.resources
+C:\Users\coway\Documents\Visual Studio 2015\Projects\Igloo_v9\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\bin\Release\Igloo.exe.config
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\bin\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\bin\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\bin\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.Form.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.FormControl.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.FormDetail.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.FormHealth.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.FormOverride.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.Resources.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v1\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\bin\Release\Igloo.exe.config
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\bin\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\bin\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\bin\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.Form.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.FormControl.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.FormDetail.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.FormHealth.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.FormOverride.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.Resources.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v3\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\bin\Release\Igloo.exe.config
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\bin\Release\Igloo.exe
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\bin\Release\Igloo.pdb
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\bin\Release\Igloo.xml
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.Form.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.FormControl.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.FormDetail.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.FormHealth.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.FormOverride.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.Resources.resources
+D:\Work\project_svn\2019\AIS_SODA_30\MMI\ais_soda_3_v4\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\bin\Release\Igloo.exe.config
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\bin\Release\Igloo.exe
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\bin\Release\Igloo.pdb
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\bin\Release\Igloo.xml
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.vbprojResolveAssemblyReference.cache
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.Form.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.FormControl.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.FormDetail.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.FormHealth.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.FormOverride.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.Resources.resources
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.vbproj.GenerateResource.Cache
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.exe
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.xml
+D:\Work\project_svn\2021\ICON_AIS\MMI\icon_ais_v2\Igloo\obj\Release\Igloo.pdb
