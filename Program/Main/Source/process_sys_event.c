@@ -28,6 +28,7 @@
 #include "hal_led.h"
 #include "hal_input.h"
 #include "hal_uv.h"
+#include "hal_pump.h"
 
 #include "drain_pump.h"
 #include "process_make.h"
@@ -350,7 +351,7 @@ static void Evt_1sec_Handler( void )
     ProcessMake();
 
     ControlRelayExclusive();
-    ControlDrainPump();
+    //ControlDrainPump();
 
     /* Power Saving */
     ProcessSaving();
@@ -489,6 +490,7 @@ static void Evt_CompRxErr_Handler( void )
 static void Evt_CheckSystem_Handler( void )
 {
 #if 0
+#if 0
     // 시스템 종류 결정 ( CHP or CP )
     if( HAL_GetInputValue( IN_HEATER ) != 0 )
     {
@@ -523,6 +525,10 @@ static void Evt_CheckSystem_Handler( void )
     SetColdWaterInitFull( TRUE );
     StartWaterOutFlushPowerOn();
 #endif
+#endif
+
+    SetWaterOutSelect( SEL_WATER_REVERSE );
+    StartWaterOut();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -621,6 +627,7 @@ void InitSystem(void)
     InitUv();
     InitVoice();
     InitSound();
+    HAL_TurnOffPump( HAL_PUMP_DRAIN );
 
     /* IO - ICE */
     HAL_InitStepMotor();

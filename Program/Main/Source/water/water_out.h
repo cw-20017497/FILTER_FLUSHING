@@ -15,7 +15,8 @@ void  InitWaterOut(void);
 #define  SEL_WATER_SODA    3
 #define  SEL_WATER_FLUSH   4
 #define  SEL_WATER_CODY    5
-#define  MAX_WATER_ID      6
+#define  SEL_WATER_REVERSE 6
+#define  MAX_WATER_ID      7
 void  SetWaterOutSelect(U8 mu8Id );
 U8    GetWaterOutSelect(void);
 U8    GetWaterOutLastedSelect(void);

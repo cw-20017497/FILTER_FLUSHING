@@ -983,12 +983,14 @@ const static make_list_t make_list[] =
 
     /* DEBUG MESSAGE */
     { PKT_EOL_DEBUG_CONTROL,         NULL },
-    { PKT_EOL_DEBUG_1,               MakePkt_Debug_1 },
-    { PKT_EOL_DEBUG_2,               MakePkt_Debug_2 },
-    { PKT_EOL_DEBUG_3,               MakePkt_Debug_3 },
-    { PKT_EOL_DEBUG_4,               MakePkt_Debug_4 },
-    { PKT_EOL_DEBUG_5,               MakePkt_Debug_5 },
-    { PKT_EOL_DEBUG_6,               MakePkt_Debug_6 },
+    { PKT_EOL_DEBUG_1,                 MakePkt_Debug_Reverse_1 },
+    //{ PKT_EOL_DEBUG_1,               MakePkt_Debug_1 },
+    //{ PKT_EOL_DEBUG_2,               MakePkt_Debug_2 },
+    //{ PKT_EOL_DEBUG_3,               MakePkt_Debug_3 },
+    //{ PKT_EOL_DEBUG_4,               MakePkt_Debug_4 },
+    //{ PKT_EOL_DEBUG_5,               MakePkt_Debug_5 },
+    //{ PKT_EOL_DEBUG_6,               MakePkt_Debug_6 },
+
     //{ PKT_EOL_DEBUG_7,               MakePkt_Debug_7 },
 };
 #define	SZ_MAKE_TABLE	( sizeof( make_list ) / sizeof( make_list_t ))

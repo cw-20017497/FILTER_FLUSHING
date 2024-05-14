@@ -41,6 +41,9 @@
     <Instance Guid="306a9869-ad5e-453d-94b4-25caee7f8bcc">
       <MemoCount>0</MemoCount>
     </Instance>
+    <Instance Guid="09b64586-00a5-49ca-872e-8817d2a05cd5">
+      <MemoCount>0</MemoCount>
+    </Instance>
   </Class>
   <Class Guid="8fb9c1f6-d351-4d10-8d99-bf5b3015b84c">
     <Instance Guid="00000000-0000-0000-0000-000000000000">

@@ -42,7 +42,10 @@
 #include "heater_out.h"
 #include "flow_valve.h"
 #include "flush_water_out.h"
+#include "reverse_flush_water_out.h"
 #include "err_comp_bldc.h"
+#include "eeprom.h"
+#include "hal_pump.h"
 
 
 #include <stdio.h>
@@ -53,67 +56,94 @@
  */
 #define MIN_PKT_SZ      6           /* HEADER + TAIL */
 
-#define DBG_RESET_COMP_PROTECT_TIME     '1'
-#define DBG_RESET_ICING_TIME            '2'
-#define DBG_RESET_DEICING_TIME          '3'
-#define DBG_RESET_ICE_FULL              '4'
-#define DBG_SETTING_CLOCK               '5'
 
-#define DBG_CANCEL_DUMMY_ICING          '6'
-#define DBG_RESET_SAVING_TIME           '7'
-#define DBG_RESET_FLUSH_OUT             '8'
-#define DBG_RESET_SERVICE_TIME          '9'
-#define DBG_TEST_RTC_24H                'A'
-#define DBG_TEST_RTC_STER               'B'
-#define DBG_TEST_RTC_CURRENT            'C'
+#define DBG_REVERSE_SAVE                       'S'
 
+#define DBG_REVERSE_RELEASE_AIR_TIME_UP        '1'
+#define DBG_REVERSE_RELEASE_AIR_TIME_DOWN      '2'
+#define DBG_REVERSE_IN_AIR_TIME_UP             '3'
+#define DBG_REVERSE_IN_AIR_TIME_DOWN           '4'
+#define DBG_REVERSE_PRESSURE_AIR_TIME_UP       '5'
+#define DBG_REVERSE_PRESSURE_AIR_TIME_DOWN     '6'
+#define DBG_REVERSE_BREAK_TIME_UP              '7'
+#define DBG_REVERSE_BREAK_TIME_DOWN            '8'
+#define DBG_REVERSE_FLUSHING_TIME_UP           '9'
+#define DBG_REVERSE_FLUSHING_TIME_DOWN         'A'
+#define DBG_REVERSE_FEED_OUT_TIME_UP           'B'
+#define DBG_REVERSE_FEED_OUT_TIME_DOWN         'C'
+#define DBG_REVERSE_SKIP                       'D'
+#define DBG_REVERSE_RESET                      'E'
+
+
+extern WaterOut_T   ReverseOut;
 void ParserDebugControl( U8 *buf, I16 len)
 {
     U8 mu8MsgType;
 
     mu8MsgType = buf[0];
-    if( mu8MsgType == DBG_RESET_COMP_PROTECT_TIME )
+
+    if( mu8MsgType == DBG_REVERSE_SAVE )
     {
-        SetCompProtectOffTime(3);
+        SaveEepromId( EEP_ID_REVERSE_1 );
+        SaveEepromId( EEP_ID_REVERSE_2 );
     }
-    else if( mu8MsgType == DBG_RESET_ICING_TIME )
+    else if( mu8MsgType == DBG_REVERSE_RELEASE_AIR_TIME_UP )
     {
-        SetIcingTime(0);
+        REVERSE_RELEASE_AIR_TIME += 100UL;
     }
-    else if( mu8MsgType == DBG_RESET_DEICING_TIME )
+    else if( mu8MsgType == DBG_REVERSE_RELEASE_AIR_TIME_DOWN )
     {
-        SetDeIcingTime(0);
+        REVERSE_RELEASE_AIR_TIME -= 100UL;
     }
-    else if( mu8MsgType == DBG_RESET_ICE_FULL )
+    else if( mu8MsgType == DBG_REVERSE_IN_AIR_TIME_UP      )
     {
-        SetIceFullCheckTimer(0);
+        REVERSE_IN_AIR_TIME += 100UL;
     }
-    else if( mu8MsgType == DBG_CANCEL_DUMMY_ICING )
+    else if( mu8MsgType == DBG_REVERSE_IN_AIR_TIME_DOWN    )
     {
-        StopDummyDeIcing();
+        REVERSE_IN_AIR_TIME -= 100UL;
     }
-    //else if( mu8MsgType == DBG_RESET_SAVING_TIME )
-    //{
-    //    // UNUSED
-    //    //SetSavingConfTimerSleep(1);
-    //    //SetSavingConfTimerWakeUp(1);
-    //}
-    else if( mu8MsgType == DBG_RESET_FLUSH_OUT )
+    else if( mu8MsgType == DBG_REVERSE_PRESSURE_AIR_TIME_UP )
     {
-        SetFlushSetupInit( FLUSH_STATUS_DONE );
-        SetFlushStatus( FLUSH_STATUS_DONE );
-        SetFlushPowerOn( FLUSH_STATUS_DONE );
-        SetHotWaterInitFull( TRUE );
-        SetColdWaterInitFull( TRUE );
+        REVERSE_PRESSURE_AIR_TIME += 100UL;
     }
-    else if( mu8MsgType == DBG_RESET_SERVICE_TIME )
+    else if( mu8MsgType == DBG_REVERSE_PRESSURE_AIR_TIME_DOWN )
     {
-        SetServiceTime( 0 );
+        REVERSE_PRESSURE_AIR_TIME -= 100UL;
     }
-    //else if( mu8MsgType == DBG_TEST_RTC_24H )
-    //{
-    //    UpdateRtcTestTime();
-    //}
+    else if( mu8MsgType == DBG_REVERSE_BREAK_TIME_UP       )
+    {
+        REVERSE_BREAK_TIME += 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_BREAK_TIME_DOWN     )
+    {
+        REVERSE_BREAK_TIME -= 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_FLUSHING_TIME_UP    )
+    {
+        REVERSE_FLUSHING_TIME += 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_FLUSHING_TIME_DOWN  )
+    {
+        REVERSE_FLUSHING_TIME -= 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_FEED_OUT_TIME_UP    )
+    {
+        REVERSE_FEED_OUT_TIME += 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_FEED_OUT_TIME_DOWN  )
+    {
+        REVERSE_FEED_OUT_TIME -= 100UL;
+    }
+    else if( mu8MsgType == DBG_REVERSE_SKIP  )
+    {
+        ReverseOut.WaitTime = 0;
+    }
+    else if( mu8MsgType == DBG_REVERSE_RESET  )
+    {
+        dbg_reverse_repeat = 0;
+        SaveEepromId( EEP_ID_REVERSE_REPEAT );
+    }
 }
 
 #if 0
@@ -213,6 +243,42 @@ void ParserDebugSettingClock( U8 *buf, I16 len)
     SetRtcTime( &mTime );
 }
 #endif
+
+I16 MakePkt_Debug_Reverse_1( U8 *buf, U16 mu16PktType )
+{
+    I16 len = 0;
+
+   /* PACKET TYPE */
+   len = SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)"TYPE_1=");
+
+   /* VALVE, PUMP */
+   len += SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)"%d:%d:%d:%d:%d@",
+           IsOpenValve( VALVE_FILTER_FEED ),
+           IsOpenValve( VALVE_FILTER_FLUSHING ),
+           IsOpenValve( VALVE_FILTER_OUT ),
+           HAL_IsTurnOnDrainPump(),
+            HAL_GetAdcValue( ANI_PUMP_DRAIN_FB )
+           );
+
+   /* TIME VARAIBLE */
+   len += SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)"%lu:%lu:%lu:%lu:%lu:%lu:%lu:%u:%d@",
+           REVERSE_RELEASE_AIR_TIME / 100UL,
+           REVERSE_IN_AIR_TIME / 100UL,
+           REVERSE_PRESSURE_AIR_TIME /100UL,
+           REVERSE_BREAK_TIME / 100UL,
+           REVERSE_FLUSHING_TIME / 100UL,
+           REVERSE_FEED_OUT_TIME / 100UL,
+           ReverseOut.WaitTime / 100UL,
+           dbg_reverse_step,
+           dbg_reverse_repeat
+           );
+
+
+   /* END */
+   len += SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)" \r\n" );
+
+    return len;
+}
 
 I16 MakePkt_Debug_1( U8 *buf, U16 mu16PktType )
 {

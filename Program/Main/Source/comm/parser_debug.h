@@ -5,6 +5,7 @@
 #include "comm.h"
 
 void ParserDebugControl( U8 *buf, I16 len);
+I16 MakePkt_Debug_Reverse_1( U8 *buf, U16 mu16PktType );
 I16 MakePkt_Debug_1( U8 *buf, U16 mu16PktType );
 I16 MakePkt_Debug_2( U8 *buf, U16 mu16PktType );
 I16 MakePkt_Debug_3( U8 *buf, U16 mu16PktType );

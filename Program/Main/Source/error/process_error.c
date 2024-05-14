@@ -49,7 +49,7 @@ void InitErrorList(void)
 }
 
 
-#if 1
+#if 0
 ErrorList_T ErrList[] = 
 {
     /*ID                        PrevError Error   Ster      Disp     CHP(ONLY) Check error                    Check release error */
@@ -100,7 +100,7 @@ ErrorList_T ErrList[] =
 {
     /*ID                        PrevError Error   Ster      Disp     CHP(ONLY) Check error                    Check release error */
     { ERR_TEMP_EVA_1,           FALSE,    FALSE,  FALSE,    FALSE,   FALSE,   NULL, NULL }, 
-    { ERR_OUTAGE_ICE_TRAY,      FALSE,    FALSE,  FALSE,    FALSE,   FALSE,   NULL, NULL }, 
+    //{ ERR_OUTAGE_ICE_TRAY,      FALSE,    FALSE,  FALSE,    FALSE,   FALSE,   NULL, NULL }, 
     { ERR_MICRO_SW_MOVE,        FALSE,    FALSE,  TRUE,     TRUE,    FALSE,   NULL, NULL }, 
     { ERR_MICRO_SW_DETECT,      FALSE,    FALSE,  TRUE,     TRUE,    FALSE,   NULL, NULL }, 
     { ERR_DRAIN_PUMP,           FALSE,    FALSE,  TRUE,     TRUE,    FALSE,   NULL, NULL }, 

@@ -119,6 +119,11 @@ typedef enum
     EEP_ID_SODA_USAGE_28,       // 소다 사용량 일일 데이터 
     EEP_ID_SODA_USAGE_29,       // 소다 사용량 일일 데이터 
 
+
+    EEP_ID_REVERSE_1,
+    EEP_ID_REVERSE_2,
+    EEP_ID_REVERSE_REPEAT,
+
     // NFC
     //EEP_ID_NFC_ERROR_HIS_COUNT,
     //EEP_ID_NFC_USER_HIS_COUNT,

@@ -24,6 +24,12 @@ typedef enum
     OUT_AMOUNT_FLUSH_CHECK_HEATER,      // 플러싱 + 온수 히터 검사 시점 유량
     OUT_AMOUNT_CHECK_HEATER,            // 온수만 채울때 히터 검사 시점 유량
 
+    OUT_AMOUNT_REVERSE_RELEASE_AIR,   
+    OUT_AMOUNT_REVERSE_IN_AIR,        
+    OUT_AMOUNT_REVERSE_PRESSURE_AIR,  
+    OUT_AMOUNT_REVERSE_DOING,         
+    OUT_AMOUNT_REVERSE_OUT,           
+
     OUT_AMOUNT_NUM,
 }WaterOutType_T;
 
@@ -37,9 +43,11 @@ typedef struct _water_out_common_
     U32 PaddingAmount;  // 오차 보정 추출량
     U32 CurrentAmount;  // 현재 추출량
 
+    U16 Mode;
+
     U8 OpenStep;
     U8 CloseStep;
-    U16 WaitTime;
+    U32 WaitTime;
 
 } WaterOut_T;
 

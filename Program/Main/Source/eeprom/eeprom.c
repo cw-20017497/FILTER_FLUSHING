@@ -10,6 +10,7 @@
 #include "cold_water.h"
 #include "water_out.h"
 #include "flush_water_out.h"
+#include "reverse_flush_water_out.h"
 #include "ice.h"
 #include "power_saving.h"
 #include "error.h"
@@ -188,6 +189,10 @@ const static EepromMap_T EepromMappingTable[] =
     { EEP_ID_CUSTOMER,                  EEP_BLOCK_9 },
     { EEP_ID_POWER_SAVING_TIME,         EEP_BLOCK_9 },
 
+    { EEP_ID_REVERSE_1,                 EEP_BLOCK_5 },
+    { EEP_ID_REVERSE_2,                 EEP_BLOCK_6 },
+    { EEP_ID_REVERSE_REPEAT,            EEP_BLOCK_7 },
+
 #if 0
     //{ EEP_ID_USER_A,                    EEP_BLOCK_5 },      
     //{ EEP_ID_USER_B,                    EEP_BLOCK_5 },      
@@ -298,16 +303,13 @@ static U8 WriteBlock3(EepromBlock_T mBlockId);
 static U8 ReadBlock3(EepromBlock_T mBlockId);
 static U8 WriteBlock4(EepromBlock_T mBlockId);
 static U8 ReadBlock4(EepromBlock_T mBlockId);
-#if 0
+
 static U8 WriteBlock5(EepromBlock_T mBlockId);
 static U8 ReadBlock5(EepromBlock_T mBlockId);
 static U8 WriteBlock6(EepromBlock_T mBlockId);
 static U8 ReadBlock6(EepromBlock_T mBlockId);
-#endif
-#if 0
 static U8 WriteBlock7(EepromBlock_T mBlockId);
 static U8 ReadBlock7(EepromBlock_T mBlockId);
-#endif
 
 static U8 WriteBlock8(EepromBlock_T mBlockId);
 static U8 ReadBlock8(EepromBlock_T mBlockId);
@@ -326,9 +328,9 @@ static EepBlockTable_T    EepromBlockTableList[] =
     { EEP_BLOCK_2,      FALSE,   WriteBlock2,   ReadBlock2 },
     { EEP_BLOCK_3,      FALSE,   WriteBlock3,   ReadBlock3 },
     { EEP_BLOCK_4,      FALSE,   WriteBlock4,   ReadBlock4 },
-    //{ EEP_BLOCK_5,      FALSE,   WriteBlock5,   ReadBlock5 },
-    //{ EEP_BLOCK_6,      FALSE,   WriteBlock6,   ReadBlock6 },
-    //{ EEP_BLOCK_7,      FALSE,   WriteBlock7,   ReadBlock7 },
+    { EEP_BLOCK_5,      FALSE,   WriteBlock5,   ReadBlock5 },
+    { EEP_BLOCK_6,      FALSE,   WriteBlock6,   ReadBlock6 },
+    { EEP_BLOCK_7,      FALSE,   WriteBlock7,   ReadBlock7 },
     { EEP_BLOCK_8,      FALSE,   WriteBlock8,   ReadBlock8 },
     { EEP_BLOCK_9,      FALSE,   WriteBlock9,   ReadBlock9 },
 };
@@ -813,45 +815,32 @@ static U8 ReadBlock4(EepromBlock_T mBlockId)
     return TRUE;
 }
 
-// USER A 
-#if 0
+
+
 static U8 WriteBlock5(EepromBlock_T mBlockId)
 {
     U16 mu16CheckSum = 0U;
-    UserInfo_T  User;
-    Liter_T mLiter;
-
-    GetUserData( &User );
 
 
-    // USER A
-    mLiter = User.Usage[ USER_A ].Daily;
-    Eep.WriteData[ 0 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 1 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 0 ] = GET_32_BYTE_8( REVERSE_RELEASE_AIR_TIME );
+    Eep.WriteData[ 1 ] = GET_32_BYTE_16( REVERSE_RELEASE_AIR_TIME );
+    Eep.WriteData[ 2 ] = GET_32_BYTE_24( REVERSE_RELEASE_AIR_TIME );
+    Eep.WriteData[ 3 ] = GET_32_BYTE_32( REVERSE_RELEASE_AIR_TIME );
 
-    mLiter = User.Usage[ USER_A ].Monthly[0];
-    Eep.WriteData[ 2 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 3 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 4 ] = GET_32_BYTE_8( REVERSE_IN_AIR_TIME );
+    Eep.WriteData[ 5 ] = GET_32_BYTE_16( REVERSE_IN_AIR_TIME );
+    Eep.WriteData[ 6 ] = GET_32_BYTE_24( REVERSE_IN_AIR_TIME );
+    Eep.WriteData[ 7 ] = GET_32_BYTE_32( REVERSE_IN_AIR_TIME );
 
-    //mLiter = User.Usage[ USER_A ].Monthly[1];
-    //Eep.WriteData[ 4 ] = GET_HIGH_BYTE( mLiter );
-    //Eep.WriteData[ 5 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 8 ] = GET_32_BYTE_8( REVERSE_PRESSURE_AIR_TIME );
+    Eep.WriteData[ 9 ] = GET_32_BYTE_16( REVERSE_PRESSURE_AIR_TIME );
+    Eep.WriteData[ 10 ] = GET_32_BYTE_24( REVERSE_PRESSURE_AIR_TIME );
+    Eep.WriteData[ 11 ] = GET_32_BYTE_32( REVERSE_PRESSURE_AIR_TIME );
 
-    // USER B 
-    mLiter = User.Usage[ USER_B ].Daily;
-    Eep.WriteData[ 6 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 7 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 12 ] = 0;
+    Eep.WriteData[ 13 ] = 0;
 
-    mLiter = User.Usage[ USER_B ].Monthly[0];
-    Eep.WriteData[ 8 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 9 ] = GET_LOW_BYTE( mLiter );
 
-    //mLiter = User.Usage[ USER_B ].Monthly[1];
-    //Eep.WriteData[ 10 ] = GET_HIGH_BYTE( mLiter );
-    //Eep.WriteData[ 11 ] = GET_LOW_BYTE( mLiter );
-
-    Eep.WriteData[ 12 ]  = 0;
-    Eep.WriteData[ 13 ]  = 0;                          
     mu16CheckSum = crc16_cal( &Eep.WriteData[0], (EEP_PAGE_SIZE - 2) );
 
     Eep.WriteData[EEP_PAGE_SIZE - 2] = GET_HIGH_BYTE( mu16CheckSum );
@@ -863,7 +852,6 @@ static U8 WriteBlock5(EepromBlock_T mBlockId)
 }
 
 
-// USER A 
 static U8 ReadBlock5(EepromBlock_T mBlockId)
 {
     U8 mu8Ret;
@@ -879,68 +867,53 @@ static U8 ReadBlock5(EepromBlock_T mBlockId)
     }
 
     // Load Data
+    REVERSE_RELEASE_AIR_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[3],
+            Eep.ReadData[2],
+            Eep.ReadData[1],
+            Eep.ReadData[0] 
+            );
 
-    // USER A
-    mLiterDaily     = GET_UINT_WORD( Eep.ReadData[1], Eep.ReadData[0] );
-    mLiterMonthly_1 = GET_UINT_WORD( Eep.ReadData[3], Eep.ReadData[2] );
-    //mLiterMonthly_2 = GET_UINT_WORD( Eep.ReadData[5], Eep.ReadData[4] );
-    SetUserUsageWater( USER_A, USAGE_DAILY, 0, mLiterDaily );
-    SetUserUsageWater( USER_A, USAGE_MONTHLY, 0, mLiterMonthly_1 );
-    //SetUserUsageWater( USER_A, USAGE_MONTHLY, 1, mLiterMonthly_2 );
+    REVERSE_IN_AIR_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[7],
+            Eep.ReadData[6],
+            Eep.ReadData[5],
+            Eep.ReadData[4] 
+            );
 
-    // USER B
-    mLiterDaily     = GET_UINT_WORD( Eep.ReadData[7], Eep.ReadData[6] );
-    mLiterMonthly_1 = GET_UINT_WORD( Eep.ReadData[9], Eep.ReadData[8] );
-    //mLiterMonthly_2 = GET_UINT_WORD( Eep.ReadData[11], Eep.ReadData[10] );
-    SetUserUsageWater( USER_B, USAGE_DAILY, 0, mLiterDaily );
-    SetUserUsageWater( USER_B, USAGE_MONTHLY, 0, mLiterMonthly_1 );
-    //SetUserUsageWater( USER_B, USAGE_MONTHLY, 1, mLiterMonthly_2 );
-
+    REVERSE_PRESSURE_AIR_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[11],
+            Eep.ReadData[10],
+            Eep.ReadData[9],
+            Eep.ReadData[8] 
+            );
 
     return TRUE;
 }
-#endif
 
 
-#if 0
-// USER C  / USER NONE
 static U8 WriteBlock6(EepromBlock_T mBlockId)
 {
     U16 mu16CheckSum = 0U;
-    UserInfo_T  User;
-    Liter_T mLiter;
 
-    GetUserData( &User );
+    Eep.WriteData[ 0 ] = GET_32_BYTE_8( REVERSE_BREAK_TIME );
+    Eep.WriteData[ 1 ] = GET_32_BYTE_16( REVERSE_BREAK_TIME );
+    Eep.WriteData[ 2 ] = GET_32_BYTE_24( REVERSE_BREAK_TIME );
+    Eep.WriteData[ 3 ] = GET_32_BYTE_32( REVERSE_BREAK_TIME );
 
+    Eep.WriteData[ 4 ] = GET_32_BYTE_8( REVERSE_FLUSHING_TIME );
+    Eep.WriteData[ 5 ] = GET_32_BYTE_16( REVERSE_FLUSHING_TIME );
+    Eep.WriteData[ 6 ] = GET_32_BYTE_24( REVERSE_FLUSHING_TIME );
+    Eep.WriteData[ 7 ] = GET_32_BYTE_32( REVERSE_FLUSHING_TIME );
 
-    // USER A
-    mLiter = User.Usage[ USER_C ].Daily;
-    Eep.WriteData[ 0 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 1 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 8 ] = GET_32_BYTE_8( REVERSE_FEED_OUT_TIME );
+    Eep.WriteData[ 9 ] = GET_32_BYTE_16( REVERSE_FEED_OUT_TIME );
+    Eep.WriteData[ 10 ] = GET_32_BYTE_24( REVERSE_FEED_OUT_TIME );
+    Eep.WriteData[ 11 ] = GET_32_BYTE_32( REVERSE_FEED_OUT_TIME );
 
-    mLiter = User.Usage[ USER_C ].Monthly[0];
-    Eep.WriteData[ 2 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 3 ] = GET_LOW_BYTE( mLiter );
+    Eep.WriteData[ 12 ] = 0;
+    Eep.WriteData[ 13 ] = 0;
 
-    //mLiter = User.Usage[ USER_C ].Monthly[1];
-    //Eep.WriteData[ 4 ] = GET_HIGH_BYTE( mLiter );
-    //Eep.WriteData[ 5 ] = GET_LOW_BYTE( mLiter );
-
-    // USER B 
-    mLiter = User.Usage[ USER_NONE ].Daily;
-    Eep.WriteData[ 6 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 7 ] = GET_LOW_BYTE( mLiter );
-
-    mLiter = User.Usage[ USER_NONE ].Monthly[0];
-    Eep.WriteData[ 8 ] = GET_HIGH_BYTE( mLiter );
-    Eep.WriteData[ 9 ] = GET_LOW_BYTE( mLiter );
-
-    //mLiter = User.Usage[ USER_NONE ].Monthly[1];
-    //Eep.WriteData[ 10 ] = GET_HIGH_BYTE( mLiter );
-    //Eep.WriteData[ 11 ] = GET_LOW_BYTE( mLiter );
-
-    Eep.WriteData[ 12 ]  = 0;
-    Eep.WriteData[ 13 ]  = 0;                          
     mu16CheckSum = crc16_cal( &Eep.WriteData[0], (EEP_PAGE_SIZE - 2) );
 
     Eep.WriteData[EEP_PAGE_SIZE - 2] = GET_HIGH_BYTE( mu16CheckSum );
@@ -968,84 +941,66 @@ static U8 ReadBlock6(EepromBlock_T mBlockId)
     }
 
     // Load Data
+    REVERSE_BREAK_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[3],
+            Eep.ReadData[2],
+            Eep.ReadData[1],
+            Eep.ReadData[0] 
+            );
 
-    // USER C
-    mLiterDaily     = GET_UINT_WORD( Eep.ReadData[1], Eep.ReadData[0] );
-    mLiterMonthly_1 = GET_UINT_WORD( Eep.ReadData[3], Eep.ReadData[2] );
-    //mLiterMonthly_2 = GET_UINT_WORD( Eep.ReadData[5], Eep.ReadData[4] );
-    SetUserUsageWater( USER_C, USAGE_DAILY, 0, mLiterDaily );
-    SetUserUsageWater( USER_C, USAGE_MONTHLY, 0, mLiterMonthly_1 );
-    //SetUserUsageWater( USER_C, USAGE_MONTHLY, 1, mLiterMonthly_2 );
+    REVERSE_FLUSHING_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[7],
+            Eep.ReadData[6],
+            Eep.ReadData[5],
+            Eep.ReadData[4] 
+            );
 
-    // USER NONE
-    mLiterDaily     = GET_UINT_WORD( Eep.ReadData[7], Eep.ReadData[6] );
-    mLiterMonthly_1 = GET_UINT_WORD( Eep.ReadData[9], Eep.ReadData[8] );
-    //mLiterMonthly_2 = GET_UINT_WORD( Eep.ReadData[11], Eep.ReadData[10] );
-    SetUserUsageWater( USER_NONE, USAGE_DAILY, 0, mLiterDaily );
-    SetUserUsageWater( USER_NONE, USAGE_MONTHLY, 0, mLiterMonthly_1 );
-    //SetUserUsageWater( USER_NONE, USAGE_MONTHLY, 1, mLiterMonthly_2 );
+    REVERSE_FEED_OUT_TIME = GET_UINT_WORD_32( 
+            Eep.ReadData[11],
+            Eep.ReadData[10],
+            Eep.ReadData[9],
+            Eep.ReadData[8] 
+            );
 
 
     return TRUE;
 }
-#endif
 
 
-#if 0
+
 static U8 WriteBlock7(EepromBlock_T mBlockId)
 {
     U16 mu16CheckSum = 0U;
-    U8 mu8Current;
-    U8 mu8Previous;
-    U32 mu32CurrentWatt;
-    U32 mu32PreviousWatt;
 
+    Eep.WriteData[ 0 ] = GET_HIGH_BYTE( dbg_reverse_repeat);
+    Eep.WriteData[ 1 ] = GET_LOW_BYTE( dbg_reverse_repeat);
+    Eep.WriteData[ 2 ] = 0;
+    Eep.WriteData[ 3 ] = 0;
+    Eep.WriteData[ 4 ] = 0;
 
-    mu8Current = GetEnergyMonth();
-    mu8Previous = mu8Current - 1;
-    if( mu8Previous == 0 )
-    {
-        mu8Previous = 12;
-    }
-    mu32CurrentWatt  = GetEnergyWattMonth( mu8Current );
-    mu32PreviousWatt = GetEnergyWattMonth( mu8Previous );
-
-    // USER A
-    Eep.WriteData[ 0 ] = mu8Current;
-
-    Eep.WriteData[ 1 ] = GET_32_BYTE_32( mu32CurrentWatt );
-    Eep.WriteData[ 2 ] = GET_32_BYTE_24( mu32CurrentWatt );
-    Eep.WriteData[ 3 ] = GET_32_BYTE_16( mu32CurrentWatt );
-    Eep.WriteData[ 4 ] = GET_32_BYTE_8( mu32CurrentWatt );
-
-    Eep.WriteData[ 5 ] = GET_32_BYTE_32( mu32PreviousWatt );
-    Eep.WriteData[ 6 ] = GET_32_BYTE_24( mu32PreviousWatt );
-    Eep.WriteData[ 7 ] = GET_32_BYTE_16( mu32PreviousWatt );
-    Eep.WriteData[ 8 ] = GET_32_BYTE_8( mu32PreviousWatt );
-
+    Eep.WriteData[ 5 ] = 0;
+    Eep.WriteData[ 6 ] = 0;
+    Eep.WriteData[ 7 ] = 0;
+    Eep.WriteData[ 8 ] = 0;
     Eep.WriteData[ 9 ] = 0;
-    Eep.WriteData[ 10 ] = 0;
-    Eep.WriteData[ 11 ] = 0;
-    Eep.WriteData[ 12 ] = 0;
 
-    Eep.WriteData[ 13 ] = 0;
-    Eep.WriteData[ 14 ] = 0;
+    Eep.WriteData[ 10 ]  = 0;
+    Eep.WriteData[ 11 ]  = 0;
+    Eep.WriteData[ 12 ]  = 0;
+    Eep.WriteData[ 13 ]  = 0;                          
 
     mu16CheckSum = crc16_cal( &Eep.WriteData[0], (EEP_PAGE_SIZE - 2) );
 
-    Eep.WriteData[EEP_PAGE_SIZE - 2] = GET_HIGH_BYTE( mu16CheckSum );
-    Eep.WriteData[EEP_PAGE_SIZE - 1] = GET_LOW_BYTE( mu16CheckSum );
+    Eep.WriteData[EEP_PAGE_SIZE - 2] = (U8)GET_HIGH_BYTE( mu16CheckSum );
+    Eep.WriteData[EEP_PAGE_SIZE - 1] = (U8)GET_LOW_BYTE( mu16CheckSum );
 
 
     // Write
     return EepromPageWrite( ((U16)mBlockId * EEP_PAGE_SIZE) , &Eep.WriteData[0] );
 }
-#endif
 
 
 
-#if 0
-// USER A 
 static U8 ReadBlock7(EepromBlock_T mBlockId)
 {
     U8 mu8Ret;
@@ -1060,40 +1015,10 @@ static U8 ReadBlock7(EepromBlock_T mBlockId)
     }
 
     // Load Data
-
-    // Current Month
-    mu8Current = Eep.ReadData[0];
-    mu8Previous = mu8Current - 1;
-    if( mu8Previous == 0 )
-    {
-        mu8Previous = 12;
-    }
-    SetEnergyMonth( mu8Current );
-
-    // current watt
-    mu32Val = GET_UINT_WORD_32( 
-            Eep.ReadData[1], 
-            Eep.ReadData[2], 
-            Eep.ReadData[3], 
-            Eep.ReadData[4] );
-    SetEnergyWattMonth( mu8Current, mu32Val );
-
-    // Previous watt
-    mu32Val = GET_UINT_WORD_32( 
-            Eep.ReadData[5], 
-            Eep.ReadData[6], 
-            Eep.ReadData[7], 
-            Eep.ReadData[8] );
-    SetEnergyWattMonth( mu8Previous, mu32Val );
-
-    //Eep.ReadData[9];
-    //Eep.ReadData[10];
-    //Eep.ReadData[11];
-    //Eep.ReadData[12];
+    dbg_reverse_repeat = GET_UINT_WORD( Eep.ReadData[1], Eep.ReadData[0] );
 
     return TRUE;
 }
-#endif
 
 
 extern WIFI_Status_T Wifi;
@@ -1358,6 +1283,7 @@ static U8 ReadDataBlocks(void)
 
 void ProcessEeprom(void)
 {
+#if 0
     // TimeShort 모드에서는 eeprom 기능 비활성화
     // 단, 메멘토 모드인 경우에는 허용한다.
     if( GetTimeShortStatus() == TRUE 
@@ -1376,6 +1302,7 @@ void ProcessEeprom(void)
             return ;
         }
     }
+#endif
 
     // Write 명령 조건 검사
     if( Eep.Write == FALSE )

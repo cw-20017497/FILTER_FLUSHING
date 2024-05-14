@@ -13,6 +13,7 @@
 #include "hot_water_out.h"
 #include "flush_water_out.h"
 #include "cody_water_out.h"
+#include "reverse_flush_water_out.h"
 #include "flow_meter.h"
 #include "water_out_common.h"
 #include "process_display.h"
@@ -115,6 +116,7 @@ void  InitWaterOut(void)
 
     // Init Out modules...
     InitFlushOut();
+    InitReverseFlushOut();
 }
 
 
@@ -791,6 +793,7 @@ static void  ControlWaterOutCmd(void)
         TurnOffHotOut();
         TurnOffFlushOut();
         TurnOffCodyOut();
+        TurnOffReverseFlushOut();
         //TurnOffSodaOut();
         return ;
     }
@@ -820,6 +823,10 @@ static void  ControlWaterOutCmd(void)
     else if( mu8Select == SEL_WATER_CODY )
     {
         TurnOnCodyOut(mOutType);
+    }
+    else if( mu8Select == SEL_WATER_REVERSE )
+    {
+        TurnOnReverseFlushOut( mOutType );
     }
 #if 0
     /* TURN ON WATER OUT - SODA */
@@ -972,6 +979,7 @@ void  ControlWaterOut(void)
     mu8OutDone |= ControlWaterColdOut();
     mu8OutDone |= ControlWaterFlushOut();
     mu8OutDone |= ControlWaterCodyOut();
+    mu8OutDone |= ControlWaterReverseFlushOut();
     if( mu8OutDone == WATER_OUT_DONE )
     {
         // 재출 방지 시간 설정

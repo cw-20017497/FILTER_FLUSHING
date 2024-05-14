@@ -10,6 +10,8 @@
 #include "parser.h"
 #include "eol.h"
 #include "water_out.h"
+#include "ice.h"
+#include "cold_water.h"
 #include "flush_water_out.h"
 #include "power_saving.h"
 #include "process_display.h"
@@ -121,6 +123,14 @@ void main( void )
 
     WifiControlProcess(WIFI_TIME_SET);
 
+    SetIceConfigMake(FALSE);
+    SetColdWaterConfigMake(FALSE);
+
+    SetFlushSetupInit( FLUSH_STATUS_DONE );
+    SetFlushStatus( FLUSH_STATUS_DONE );
+    SetFlushPowerOn( FLUSH_STATUS_DONE );
+    SetWaterOutSelect( SEL_WATER_ROOM );
+    
     while(1)
     {
         R_WDT_Restart();
