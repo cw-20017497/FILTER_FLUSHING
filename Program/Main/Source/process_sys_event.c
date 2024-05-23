@@ -173,7 +173,7 @@ const static SysEvent_T	SysEventList[] =
     { TIMER_ID_DEBUG,               Evt_Debug_Handler,          Evt_Debug_Handler,        Evt_Debug_Handler,      Evt_Debug_Handler },
     { TIMER_ID_DRAIN_PUMP_24H,      Evt_DrainPump_Handler,      NULL,                     NULL,                   NULL },
 #endif
-    { TIMER_ID_COMM_FRONT_RX_ERR,   Evt_FrontRxErr_Handler,     NULL,                     NULL,                   NULL },
+    //{ TIMER_ID_COMM_FRONT_RX_ERR,   Evt_FrontRxErr_Handler,     NULL,                     NULL,                   NULL },
 
     { TIMER_ID_COMP,                Evt_Comp_Handler,           Evt_Comp_Handler,         Evt_Comp_Handler,       Evt_Comp_Handler },
     { TIMER_ID_COMM_COMP_RX_ERR,    Evt_CompRxErr_Handler,      Evt_CompRxErr_Handler,    NULL,                   NULL },
@@ -264,7 +264,7 @@ static void Evt_10ms_Handler( void )
     ControlValve();
 
     ControlIceTray();
-    ControlRelayConcurrent();
+    //ControlRelayConcurrent();
     
     ControlSwingBar();
 
@@ -309,7 +309,7 @@ static void Evt_100ms_Handler(void)
     UpdateEolTimer();
 
 #if !CONFIG_JIG_RBK_FRONT
-    ProcessFilter();
+    //ProcessFilter();
 #endif
 
 #if !CONFIG_TEST_8585
@@ -350,7 +350,7 @@ static void Evt_1sec_Handler( void )
     /* Process making  cold water & ice */
     ProcessMake();
 
-    ControlRelayExclusive();
+    //ControlRelayExclusive();
     //ControlDrainPump();
 
     /* Power Saving */
