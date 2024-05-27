@@ -162,6 +162,7 @@ Public Class Form
         DispReverseStep(s(7))
 
         lbRepeat.Text = s(8) & " 번"
+        lbRepeat3.Text = "( " & s(9) & " )"
 
     End Sub
     Sub DispReverseStep(ByVal s As String)

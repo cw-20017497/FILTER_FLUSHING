@@ -18,3 +18,4 @@ D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\MMI\mmi_tech_filter_flushing\ReFil
 D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\MMI\mmi_tech_filter_flushing\ReFilter\obj\Debug\ReFilter.exe
 D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\MMI\mmi_tech_filter_flushing\ReFilter\obj\Debug\ReFilter.xml
 D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\MMI\mmi_tech_filter_flushing\ReFilter\obj\Debug\ReFilter.pdb
+D:\Work\project_svn\2024\TECH_FILTER_FLUSHING\MMI\mmi_tech_filter_flushing\ReFilter\obj\Debug\ReFilter.vbprojResolveAssemblyReference.cache

@@ -87,6 +87,7 @@ Partial Class Form
         Me.lbRepeat = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.btnReset = New System.Windows.Forms.Button()
+        Me.lbRepeat3 = New System.Windows.Forms.Label()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox9.SuspendLayout()
         Me.GroupBox14.SuspendLayout()
@@ -607,6 +608,7 @@ Partial Class Form
         Me.GroupBox1.Controls.Add(Me.lbStep3)
         Me.GroupBox1.Controls.Add(Me.lbStep2)
         Me.GroupBox1.Controls.Add(Me.lbStep1)
+        Me.GroupBox1.Controls.Add(Me.lbRepeat3)
         Me.GroupBox1.Controls.Add(Me.lbRepeat)
         Me.GroupBox1.Controls.Add(Me.Label9)
         Me.GroupBox1.Controls.Add(Me.btnReset)
@@ -717,6 +719,15 @@ Partial Class Form
         Me.btnReset.Text = "동작 횟수 초기화"
         Me.btnReset.UseVisualStyleBackColor = True
         '
+        'lbRepeat3
+        '
+        Me.lbRepeat3.AutoSize = True
+        Me.lbRepeat3.Location = New System.Drawing.Point(123, 70)
+        Me.lbRepeat3.Name = "lbRepeat3"
+        Me.lbRepeat3.Size = New System.Drawing.Size(21, 12)
+        Me.lbRepeat3.TabIndex = 8
+        Me.lbRepeat3.Text = "(3)"
+        '
         'Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 12.0!)
@@ -810,4 +821,5 @@ Partial Class Form
     Friend WithEvents lbStep6 As Label
     Friend WithEvents lbStep5 As Label
     Friend WithEvents lbStep4 As Label
+    Friend WithEvents lbRepeat3 As Label
 End Class
