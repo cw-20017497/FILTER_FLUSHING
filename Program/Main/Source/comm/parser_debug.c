@@ -261,7 +261,7 @@ I16 MakePkt_Debug_Reverse_1( U8 *buf, U16 mu16PktType )
            );
 
    /* TIME VARAIBLE */
-   len += SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)"%lu:%lu:%lu:%lu:%lu:%lu:%lu:%u:%d@",
+   len += SPRINTF( (char __FAR *)&buf[ len ], (const char __FAR *)"%lu:%lu:%lu:%lu:%lu:%lu:%lu:%u:%d:%d@",
            REVERSE_RELEASE_AIR_TIME / 100UL,
            REVERSE_IN_AIR_TIME / 100UL,
            REVERSE_PRESSURE_AIR_TIME /100UL,
@@ -270,8 +270,10 @@ I16 MakePkt_Debug_Reverse_1( U8 *buf, U16 mu16PktType )
            REVERSE_FEED_OUT_TIME / 100UL,
            ReverseOut.WaitTime / 100UL,
            dbg_reverse_step,
-           dbg_reverse_repeat
+           dbg_reverse_repeat,
+           ReverseRepeat
            );
+
 
 
    /* END */

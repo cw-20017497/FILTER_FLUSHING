@@ -50,6 +50,7 @@ U32 REVERSE_PRESSURE_AIR_TIME   = (10L * 100UL );
 U32 REVERSE_BREAK_TIME          = (1UL * 100UL );
 U32 REVERSE_FLUSHING_TIME       = (20UL * 100UL );
 U32 REVERSE_FEED_OUT_TIME       = (60UL * 60UL * 100UL );
+U8  REVERSE_REPEAT_COUNT        = 3;
 #endif
 
 const static WaterOutTable_T ReverseFlushTableList[] = 
@@ -306,10 +307,11 @@ enum
     REVERSE_FEED_OUT_DONE
 };
 
+
+U8  ReverseRepeat = 0;
 static U8 DoReverseFlushing(U8 *pStep)
 {
     static U16 mu16Time = 0U; // @10ms
-    U32  mAmount;
 
 
     switch( *pStep )
@@ -330,6 +332,7 @@ static U8 DoReverseFlushing(U8 *pStep)
             }
             else
             {
+                ReverseRepeat   = REVERSE_REPEAT_COUNT;
                 dbg_reverse_step = DBG_STEP_RELEASE_AIR;
 
                 ReverseOut.WaitTime = REVERSE_RELEASE_AIR_TIME;
@@ -427,12 +430,24 @@ static U8 DoReverseFlushing(U8 *pStep)
             }
             else
             {
-                mu16Time = VALVE_DELAY_TIME;
-                CloseValve( VALVE_FILTER_FLUSHING );
-                (*pStep)++;
+                // 3회 반복
+                if( ReverseRepeat != 0)
+                {
+                    ReverseRepeat--;
+                }
+
+                if( ReverseRepeat != 0 )
+                {
+                    (*pStep) = REVERSE_RELEASE_AIR_WAIT;
+                }
+                else
+                {
+                    mu16Time = VALVE_DELAY_TIME;
+                    CloseValve( VALVE_FILTER_FLUSHING );
+                    (*pStep)++;
+                }
             }
             break;
-
 
         case REVERSE_FEED_OUT:
             if( mu16Time != 0 )

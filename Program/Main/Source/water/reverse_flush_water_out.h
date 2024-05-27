@@ -34,6 +34,7 @@ extern U32 REVERSE_FEED_OUT_TIME;
 
 extern U8  dbg_reverse_step;
 extern U16  dbg_reverse_repeat;
+extern U8  ReverseRepeat;
 
 
 void InitReverseFlushOut(void);
