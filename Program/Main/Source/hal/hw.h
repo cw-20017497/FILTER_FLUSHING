@@ -339,14 +339,14 @@
 #define GET_STATUS_VALVE_COLD_AIR()         ( P_VALVE_COLD_AIR )
 
 #define P_VALVE_COLD_DRAIN                  P3.0
-#define OPEN_VALVE_COLD_DRAIN()             do{ P_VALVE_COLD_DRAIN = 1; }while(0)
-#define CLOSE_VALVE_COLD_DRAIN()            do{ P_VALVE_COLD_DRAIN = 0; }while(0)
+#define OPEN_VALVE_COLD_DRAIN()             do{ P_VALVE_COLD_DRAIN = 0; }while(0)
+#define CLOSE_VALVE_COLD_DRAIN()            do{ P_VALVE_COLD_DRAIN = 1; }while(0)
 #define GET_STATUS_VALVE_COLD_DRAIN()       ( P_VALVE_COLD_DRAIN )
 
 /* VALVE - COLD FLUSHING (FEED) */
 #define  P_VALVE_COLD_FLUSH                 P5.2
-#define  OPEN_VALVE_COLD_FLUSH()            do{ P_VALVE_COLD_FLUSH = 1; }while(0)
-#define  CLOSE_VALVE_COLD_FLUSH()           do{ P_VALVE_COLD_FLUSH = 0; }while(0)
+#define  OPEN_VALVE_COLD_FLUSH()            do{ P_VALVE_COLD_FLUSH = 0; }while(0)
+#define  CLOSE_VALVE_COLD_FLUSH()           do{ P_VALVE_COLD_FLUSH = 1; }while(0)
 #define  GET_STATUS_VALVE_COLD_FLUSH()      (P_VALVE_COLD_FLUSH)
 
 /* VALVE - HOT IN */
